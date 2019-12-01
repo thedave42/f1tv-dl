@@ -1,5 +1,7 @@
 const yargs = require('yargs');
 const axios = require('axios');
+const { pour } = require('std-pour');
+const ffmpeg = require('ffmpeg-cli');
 
 const baseUrl = 'https://f1tv.formula1.com';
 
@@ -143,7 +145,7 @@ const getSessionChannelList = (urlStr) => {
 const getTokenizedUrl = itemPath => {
     let isAsset = (itemPath.indexOf('assets') !== -1);
     let item =  (isAsset)?{'asset_url': itemPath}:{'channel_url': itemPath};
-    console.info('item', item);
+    //console.info('item', item);
 
     return axios.post('/api/viewings/', item, {baseURL: baseUrl})
         .then(response => (isAsset)?response.data.objects.shift().tata.tokenised_url:response.data.tokenised_url);
@@ -156,7 +158,8 @@ async function run() {
         const {
             url: url,
             channel: channel,
-            channelList: channelList
+            channelList: channelList,
+            audioStream: audioStream
         } = yargs
                 .command('$0 <url>', 'Download a video', (yarg) => {
                     yarg
@@ -176,6 +179,12 @@ async function run() {
                             default: 'wif',
                             alias: 'c'
                         })
+                        .option('audio-stream', {
+                            type: 'string',
+                            desc: 'Specify audio stream index to download',
+                            default: '0',
+                            alias: 'a'
+                        })
                         .option('channel-list', {
                             type: 'boolean',
                             desc: 'Provides a list of channels available from url (for videos with multiple cameras)',
@@ -186,12 +195,18 @@ async function run() {
                 .showHelpOnFail()
                 .parse()
 
-            console.info(`channel-list is ${channelList} url is ${url}`);
+            //console.info(`channel-list is ${channelList} url is ${url}`);
             if (!channelList) {
-                console.info('finding url')
+                //console.info('finding url')
                 getItemUrl(url, channel)
                 .then(item => {return getTokenizedUrl(item)})
-                .then(item => {console.info('tokenized url:', item); process.exit(1);})
+                .then(item => {
+                    console.info('tokenized url:', item);
+                    //console.info(ffmpeg.path);
+                    let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
+                    //console.info('tsFile:', tsFile);
+                    return pour(ffmpeg.path, ['-i', item,  '-c', 'copy', '-map', '0:p:0:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
+                })
                 .catch(e => console.error('getItemUrl Error:', e.message));
             }
             if (channelList) {
