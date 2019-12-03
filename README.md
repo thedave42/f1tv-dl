@@ -21,6 +21,12 @@ Options:
                       with multiple cameras)          [boolean] [default: false]
 ```
 
+## Install
+Clone the repo and run npm install to install dependencies.
+`git clone https://github.com/thedave42/f1tv-dl.git`
+`cd f1tv-dl`
+`npm i`
+
 ## Download a video 
 
 `node index.js https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race`
