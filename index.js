@@ -203,8 +203,8 @@ async function run() {
                 .then(item => {
                     console.info('tokenized url:', item);
                     console.info(ffmpeg.path);
-                    let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
-                    //console.info('tsFile:', tsFile);
+                    let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
+                    console.info('tsFile:', tsFile);
                     return pour(ffmpeg.path, ['-i', item,  '-c', 'copy', '-map', '0:p:0:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
                 })
                 .catch(e => console.error('getItemUrl Error:', e.message));
