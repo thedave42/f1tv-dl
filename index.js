@@ -4,6 +4,7 @@ const { pour } = require('std-pour');
 const ffmpeg = require('ffmpeg-cli');
 
 const baseUrl = 'https://f1tv.formula1.com';
+const authHeader = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1ZyI6IlVTQSIsImVtYWlsIjpudWxsLCJleHAiOjE1ODIxMzc5NjEsImlkIjoxNzM1MzU4MX0.YqyUpQmMXc6qRbt61wptFPdz9vXHJ09MGt5f_jss-JU'};
 
 const isUrl = string => {
     try { return Boolean(new URL(string));}
@@ -145,9 +146,9 @@ const getSessionChannelList = (urlStr) => {
 const getTokenizedUrl = itemPath => {
     let isAsset = (itemPath.indexOf('assets') !== -1);
     let item =  (isAsset)?{'asset_url': itemPath}:{'channel_url': itemPath};
-    //console.info('item', item);
+    console.info('item', item);
 
-    return axios.post('/api/viewings/', item, {baseURL: baseUrl})
+    return axios.post('/api/viewings/', item, {baseURL: baseUrl, headers: authHeader })
         .then(response => (isAsset)?response.data.objects.shift().tata.tokenised_url:response.data.tokenised_url);
 }
 
@@ -205,9 +206,9 @@ async function run() {
                     console.info(ffmpeg.path);
                     let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
                     console.info('tsFile:', tsFile);
-                    return pour(ffmpeg.path, ['-i', item,  '-c', 'copy', '-map', '0:p:0:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
+                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', '0:p:6:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
                 })
-                .catch(e => console.error('getItemUrl Error:', e.message));
+                .catch(e => console.error('getItemUrl Error', e.message));
             }
             if (channelList) {
                 getSessionChannelList(url)
