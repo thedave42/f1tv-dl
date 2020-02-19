@@ -4,7 +4,7 @@ const { pour } = require('std-pour');
 const ffmpeg = require('ffmpeg-cli');
 
 const baseUrl = 'https://f1tv.formula1.com';
-const authHeader = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1ZyI6IlVTQSIsImVtYWlsIjpudWxsLCJleHAiOjE1ODIxMzc5NjEsImlkIjoxNzM1MzU4MX0.YqyUpQmMXc6qRbt61wptFPdz9vXHJ09MGt5f_jss-JU'};
+const authHeader = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1ZyI6IlVTQSIsImVtYWlsIjpudWxsLCJleHAiOjE1ODI2NTk3ODAsImlkIjoxNzY3Mjg5Mn0._GZQZ6rbJ6PhYcuP2G6OVlTMJ6WXUxYpUamWnJ3lhJg'};
 
 const isUrl = string => {
     try { return Boolean(new URL(string));}
@@ -64,7 +64,7 @@ const getSessionUrl = (urlStr, searchStr='wif') => {
         }
     })
     .then(response => {
-        //console.info(response.data.objects);
+        console.info(response.data.objects);
         return axios.get(`/api/session-occurrence/${response.data.objects.shift().uid}/`, {
             baseURL: baseUrl,
             params: {
@@ -73,25 +73,26 @@ const getSessionUrl = (urlStr, searchStr='wif') => {
         })
     })
     .then(response => {
-        //console.info('looking up channel');
+        console.info('looking up channel');
         return getSessionChannelUrl(searchStr, response.data.channel_urls);
     })
 }
 
 const getSessionChannelUrl = (searchStr, channels = []) => {
-    //console.info('getSessionChannelUrl', searchStr, channels);
+    console.info('getSessionChannelUrl', searchStr, channels);
     let channel = channels.shift();
     return axios.get(channel, {
-        baseURL: baseUrl,
-        params: {
+        baseURL: baseUrl
+        /*params: {
             'fields': 'channel_type,driver_urls__driver_racingnumber,driver_urls__driver_tla,driver_urls__first_name,driver_urls__image_urls__image_type,driver_urls__image_urls__url,driver_urls__image_urls,driver_urls__last_name,driver_urls__team_url__colour,driver_urls__team_url__name,driver_urls__team_url,driver_urls,name,ovps,self,slug,uid',
             'fields_to_expand': 'driver_urls,driver_urls__image_urls,driver_urls__team_url',
             'slug': 'home'
-        }
+        }*/
     })
     .then(response => {
         let data = (response.data.channel_type === 'driver')?[response.data.name, response.data.driver_urls[0].driver_tla, `${response.data.driver_urls[0].driver_racingnumber}`]:[response.data.name];
         if ( data.find(item => item.toLowerCase().indexOf(searchStr.toLowerCase()) !== -1) !== undefined ) { return response.data.self }
+        console.info(`Calling getSesssionChannelUrl(${searchStr}, ${channels})`);
         return getSessionChannelUrl(searchStr, channels);
     })
 }
@@ -105,12 +106,12 @@ const printSessionChannelList = (channels = []) => {
     let channel = channels.shift();
     //if (channels.length < 1) { return }
     return axios.get(channel, {
-        baseURL: baseUrl,
+        baseURL: baseUrl/*,
         params: {
             'fields': 'channel_type,driver_urls__driver_racingnumber,driver_urls__driver_tla,driver_urls__first_name,driver_urls__image_urls__image_type,driver_urls__image_urls__url,driver_urls__image_urls,driver_urls__last_name,driver_urls__team_url__colour,driver_urls__team_url__name,driver_urls__team_url,driver_urls,name,ovps,self,slug,uid',
             'fields_to_expand': 'driver_urls,driver_urls__image_urls,driver_urls__team_url',
             'slug': 'home'
-        }
+        }*/
     })
     .then((response) => {
         let data = (response.data.channel_type === 'driver')?`name: ${response.data.name} number: ${response.data.driver_urls[0].driver_racingnumber} tla: ${response.data.driver_urls[0].driver_tla}`:`name: ${response.data.name}`;
@@ -200,15 +201,18 @@ async function run() {
             if (!channelList) {
                 //console.info('finding url')
                 getItemUrl(url, channel)
-                .then(item => {return getTokenizedUrl(item)})
+                .then(item => {
+                    console.info('item:', item);
+                    return getTokenizedUrl(item);
+                })
                 .then(item => {
                     console.info('tokenized url:', item);
                     console.info(ffmpeg.path);
                     let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
                     console.info('tsFile:', tsFile);
-                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', '0:p:6:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
+                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', '0:p:0:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
                 })
-                .catch(e => console.error('getItemUrl Error', e.message));
+                .catch(e => console.error('getItemUrl Error:', e));
             }
             if (channelList) {
                 getSessionChannelList(url)
