@@ -161,6 +161,7 @@ async function run() {
             url: url,
             channel: channel,
             channelList: channelList,
+            programStream: programStream,
             audioStream: audioStream
         } = yargs
                 .command('$0 <url>', 'Download a video', (yarg) => {
@@ -180,6 +181,12 @@ async function run() {
                             desc: 'Choose wif,driver,data,pit lane or specify driver name/number/tla',
                             default: 'wif',
                             alias: 'c'
+                        })
+                        .option('program-stream', {
+                            type: 'string',
+                            desc: 'Specify the program for the video stream',
+                            default: '0',
+                            alias: 'v'
                         })
                         .option('audio-stream', {
                             type: 'string',
@@ -210,7 +217,7 @@ async function run() {
                     console.info(ffmpeg.path);
                     let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
                     console.info('tsFile:', tsFile);
-                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', '0:p:0:v', '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
+                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
                 })
                 .catch(e => console.error('getItemUrl Error:', e));
             }

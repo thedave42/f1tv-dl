@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "ffmpeg-cli": "github:thedave42/ffmpeg-cli",
+    "fluent-ffmpeg": "^2.1.2",
     "std-pour": "^1.1.0",
     "yargs": "^15.0.2"
   },
