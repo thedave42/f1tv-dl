@@ -2,9 +2,16 @@ const yargs = require('yargs');
 const axios = require('axios');
 const { pour } = require('std-pour');
 const ffmpeg = require('ffmpeg-cli');
+//const ffmpeg = require('fluent-ffmpeg');
 
+const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
 const baseUrl = 'https://f1tv.formula1.com';
-const authHeader = {'Authorization': 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1ZyI6IlVTQSIsImVtYWlsIjpudWxsLCJleHAiOjE1ODI2NTk3ODAsImlkIjoxNzY3Mjg5Mn0._GZQZ6rbJ6PhYcuP2G6OVlTMJ6WXUxYpUamWnJ3lhJg'};
+const loginUrl = 'https://api.formula1.com/';
+const f1TvAuthUrl = 'https://f1tv-api.formula1.com';
+const loginDistributionChannel = 'd861e38f-05ea-4063-8776-a7e2b6d885a4';
+const identityProviderUrl = '/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/';
+const auth = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1ZyI6IlVTQSIsImVtYWlsIjpudWxsLCJleHAiOjE1ODMzNjUxNzEsImlkIjoxODM4MDAzM30.lgSa79135Pxu04F_f-oQkDUP81zqsQTWpN7Jn3v-Wbw';
+let authData;
 
 const isUrl = string => {
     try { return Boolean(new URL(string));}
@@ -98,8 +105,47 @@ const getSessionChannelUrl = (searchStr, channels = []) => {
 }
 
 const getItemUrl = (urlStr, searchStr) => {
-    try { return (isF1tvEpisodeUrl(urlStr))?getEpisodeUrl(urlStr):getSessionUrl(urlStr, searchStr); }
-    catch (e) { return undefined; }
+    if ( authData.user !== undefined && authData.pass !== undefined) {
+        return loginF1(authData.user, authData.pass)
+            .then( token => {
+                console.info('token', token);
+                authData.jwt = token;
+                return (isF1tvEpisodeUrl(urlStr))?getEpisodeUrl(urlStr):getSessionUrl(urlStr, searchStr); 
+            })
+    }
+    else {
+        return (isF1tvEpisodeUrl(urlStr))?getEpisodeUrl(urlStr):getSessionUrl(urlStr, searchStr); 
+    }
+}
+
+const loginF1 = (username, password) => {
+    let requestData = {
+        'Login': username,
+        'Password': password,
+        'DistributionChannel': loginDistributionChannel
+    };
+    let requestHeaders = {
+        'apiKey': apiKey,
+        'TE': 'Trailers' 
+    }
+    
+    return axios.post('/v2/account/subscriber/authenticate/by-password', requestData, {baseURL: loginUrl, headers: requestHeaders })
+        .then( response => {
+            //console.info(response);
+            let requestData = {
+                'identity_provider_url': identityProviderUrl,
+                'access_token': response.data.data.subscriptionToken
+            };
+            return axios.post('/agl/1.0/unk/en/all_devices/global/authenticate', requestData, {baseURL: f1TvAuthUrl});
+        })
+        .then( response => {
+            return (response.data.token);
+        })
+        .catch( e => {
+            console.error('-------------------------------loginF1 Error-------------------------------------');
+            console.error(e);
+            return null;
+        })
 }
 
 const printSessionChannelList = (channels = []) => {
@@ -148,6 +194,8 @@ const getTokenizedUrl = itemPath => {
     let isAsset = (itemPath.indexOf('assets') !== -1);
     let item =  (isAsset)?{'asset_url': itemPath}:{'channel_url': itemPath};
     console.info('item', item);
+    console.info('authData', authData);
+    let authHeader = {'Authorization': `JWT ${authData.jwt}`};
 
     return axios.post('/api/viewings/', item, {baseURL: baseUrl, headers: authHeader })
         .then(response => (isAsset)?response.data.objects.shift().tata.tokenised_url:response.data.tokenised_url);
@@ -162,7 +210,10 @@ async function run() {
             channel: channel,
             channelList: channelList,
             programStream: programStream,
-            audioStream: audioStream
+            audioStream: audioStream,
+            outputDirectory: outputDir,
+            username: f1Username,
+            password: f1Password
         } = yargs
                 .command('$0 <url>', 'Download a video', (yarg) => {
                     yarg
@@ -194,6 +245,30 @@ async function run() {
                             default: '0',
                             alias: 'a'
                         })
+                        .option('output-directory', {
+                            type: 'string',
+                            desc: 'Specify a directory for the downloaded file',
+                            default: null,
+                            alias: 'o',
+                            coerce: outDir => {
+                                if (outDir !== null) {
+                                    if (!outDir.endsWith('\\')) {
+                                        outDir = outDir + '\\';
+                                    }
+                                }
+                                return outDir;
+                            }
+                        })
+                        .option('username', {
+                            type: 'string',
+                            desc: 'F1TV User name',
+                            alias: 'U'
+                        })
+                        .option('password', {
+                            type: 'string',
+                            desc: 'F1TV password',
+                            alias: 'P'
+                        })
                         .option('channel-list', {
                             type: 'boolean',
                             desc: 'Provides a list of channels available from url (for videos with multiple cameras)',
@@ -207,6 +282,15 @@ async function run() {
             //console.info(`channel-list is ${channelList} url is ${url}`);
             if (!channelList) {
                 //console.info('finding url')
+
+                console.info('User:', f1Username, 'Password:', f1Password);
+
+                authData ={
+                    'user': f1Username,
+                    'pass': f1Password,
+                    'jwt': auth
+                };
+
                 getItemUrl(url, channel)
                 .then(item => {
                     console.info('item:', item);
@@ -214,10 +298,25 @@ async function run() {
                 })
                 .then(item => {
                     console.info('tokenized url:', item);
-                    console.info(ffmpeg.path);
+                    //console.info(ffmpeg.path);
                     let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
+                    if (outputDir !== null) {
+                        console.info('Outputting file to:', outputDir);
+                        tsFile = outputDir + tsFile;
+                    }
                     console.info('tsFile:', tsFile);
-                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:0:${audioStream}`, '-y', tsFile], {});
+                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', tsFile], {});
+                    /*
+                    return ffmpeg(item)
+                        .inputOptions('-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:0:${audioStream}`, '-y')
+                        .on('progress', info => {
+                            console.info('Progress:', info.percent, '%');
+                        })
+                        .on('error', e => {
+                            console.error('ffmpeg error:', e);
+                        })
+                        .save(tsFile);
+                    */
                 })
                 .catch(e => console.error('getItemUrl Error:', e));
             }
