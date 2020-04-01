@@ -183,7 +183,7 @@ const getSessionChannelList = (urlStr) => {
         })
     })
     .then(response => {
-        console.info(response.data);
+        //console.info(response.data);
         return printSessionChannelList(response.data.channel_urls);
     })
 }
