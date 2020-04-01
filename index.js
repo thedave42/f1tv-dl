@@ -151,15 +151,13 @@ const printSessionChannelList = (channels = []) => {
     let channel = channels.shift();
     //if (channels.length < 1) { return }
     return axios.get(channel, {
-        baseURL: baseUrl/*,
+        baseURL: baseUrl,
         params: {
-            'fields': 'channel_type,driver_urls__driver_racingnumber,driver_urls__driver_tla,driver_urls__first_name,driver_urls__image_urls__image_type,driver_urls__image_urls__url,driver_urls__image_urls,driver_urls__last_name,driver_urls__team_url__colour,driver_urls__team_url__name,driver_urls__team_url,driver_urls,name,ovps,self,slug,uid',
-            'fields_to_expand': 'driver_urls,driver_urls__image_urls,driver_urls__team_url',
-            'slug': 'home'
-        }*/
+            'fields_to_expand': 'driveroccurrence_urls'
+        }
     })
     .then((response) => {
-        let data = (response.data.channel_type === 'driver')?`name: ${response.data.name} number: ${response.data.driver_urls[0].driver_racingnumber} tla: ${response.data.driver_urls[0].driver_tla}`:`name: ${response.data.name}`;
+        let data = (response.data.channel_type === 'driver')?`name: ${response.data.name} number: ${response.data.driveroccurrence_urls[0].driver_racingnumber} tla: ${response.data.driveroccurrence_urls[0].driver_tla}`:`name: ${response.data.name}`;
         console.info(data);
         return (channels.length > 0)?printSessionChannelList(channels):'';
     })
@@ -185,6 +183,7 @@ const getSessionChannelList = (urlStr) => {
         })
     })
     .then(response => {
+        console.info(response.data);
         return printSessionChannelList(response.data.channel_urls);
     })
 }
