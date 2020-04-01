@@ -89,17 +89,16 @@ const getSessionChannelUrl = (searchStr, channels = []) => {
     console.info('getSessionChannelUrl', searchStr, channels);
     let channel = channels.shift();
     return axios.get(channel, {
-        baseURL: baseUrl
-        /*params: {
-            'fields': 'channel_type,driver_urls__driver_racingnumber,driver_urls__driver_tla,driver_urls__first_name,driver_urls__image_urls__image_type,driver_urls__image_urls__url,driver_urls__image_urls,driver_urls__last_name,driver_urls__team_url__colour,driver_urls__team_url__name,driver_urls__team_url,driver_urls,name,ovps,self,slug,uid',
-            'fields_to_expand': 'driver_urls,driver_urls__image_urls,driver_urls__team_url',
-            'slug': 'home'
-        }*/
+        baseURL: baseUrl,
+        params: {
+            'fields_to_expand': 'driveroccurrence_urls'
+        }
     })
     .then(response => {
-        let data = (response.data.channel_type === 'driver')?[response.data.name, response.data.driver_urls[0].driver_tla, `${response.data.driver_urls[0].driver_racingnumber}`]:[response.data.name];
+        //console.info('getSessionChannelUrl response', response.data);
+        let data = (response.data.channel_type === 'driver')?[response.data.name, response.data.driveroccurrence_urls[0].driver_tla, `${response.data.driveroccurrence_urls[0].driver_racingnumber}`]:[response.data.name];
         if ( data.find(item => item.toLowerCase().indexOf(searchStr.toLowerCase()) !== -1) !== undefined ) { return response.data.self }
-        console.info(`Calling getSesssionChannelUrl(${searchStr}, ${channels})`);
+        //console.info(`Calling getSesssionChannelUrl(${searchStr}, ${channels})`);
         return getSessionChannelUrl(searchStr, channels);
     })
 }
