@@ -149,6 +149,10 @@ const loginF1 = (username, password) => {
         })
 }
 
+const makeItGreen = (str) => {
+    return '\x1b[32m' + str + '\x1b[37m';
+}
+
 const printSessionChannelList = (channels = []) => {
     let channel = channels.shift();
     //if (channels.length < 1) { return }
@@ -159,8 +163,8 @@ const printSessionChannelList = (channels = []) => {
         }
     })
     .then((response) => {
-        let data = (response.data.channel_type === 'driver')?`name: ${response.data.name} number: ${response.data.driveroccurrence_urls[0].driver_racingnumber} tla: ${response.data.driveroccurrence_urls[0].driver_tla}`:`name: ${response.data.name}`;
-        log.debug(data);
+        let data = (response.data.channel_type === 'driver')?`name: ${makeItGreen(response.data.name)}`.padEnd(37) + `number: ${makeItGreen(response.data.driveroccurrence_urls[0].driver_racingnumber)}`.padEnd(25) + `tla: ${makeItGreen(response.data.driveroccurrence_urls[0].driver_tla)}`:`name: ${makeItGreen(response.data.name)}`;
+        log.info(data);
         return (channels.length > 0)?printSessionChannelList(channels):'';
     })
 }
