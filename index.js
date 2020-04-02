@@ -1,8 +1,10 @@
 const yargs = require('yargs');
 const axios = require('axios');
-const { pour } = require('std-pour');
-const ffmpeg = require('ffmpeg-cli');
-//const ffmpeg = require('fluent-ffmpeg');
+const log = require('loglevel');
+//const moment = require('moment');
+//const { pour } = require('std-pour');
+//const ffmpeg = require('ffmpeg-cli');
+const ffmpeg = require('fluent-ffmpeg');
 
 const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
 const baseUrl = 'https://f1tv.formula1.com';
@@ -47,7 +49,7 @@ const getSlugName = urlStr => {
 
 const getEpisodeUrl = urlStr => {
     let slug = getSlugName(urlStr);
-    console.info(`getEpisodeUrl Slug is ${slug}`);
+    log.debug(`getEpisodeUrl Slug is ${slug}`);
     return axios.get('/api/episodes/', {
         baseURL: baseUrl,
         params: {
@@ -62,7 +64,7 @@ const getEpisodeUrl = urlStr => {
 
 const getSessionUrl = (urlStr, searchStr='wif') => {
     let slug = getSlugName(urlStr);
-    console.info(`getSessionUrl Slug is ${slug}`);
+    log.debug(`getSessionUrl Slug is ${slug}`);
     return axios.get('/api/session-occurrence/', {
         baseURL: baseUrl,
         params: {
@@ -71,7 +73,7 @@ const getSessionUrl = (urlStr, searchStr='wif') => {
         }
     })
     .then(response => {
-        console.info(response.data.objects);
+        log.debug(response.data.objects);
         return axios.get(`/api/session-occurrence/${response.data.objects.shift().uid}/`, {
             baseURL: baseUrl,
             params: {
@@ -80,13 +82,13 @@ const getSessionUrl = (urlStr, searchStr='wif') => {
         })
     })
     .then(response => {
-        console.info('looking up channel');
+        log.info('looking up channel');
         return getSessionChannelUrl(searchStr, response.data.channel_urls);
     })
 }
 
 const getSessionChannelUrl = (searchStr, channels = []) => {
-    console.info('getSessionChannelUrl', searchStr, channels);
+    log.trace('getSessionChannelUrl', searchStr, channels);
     let channel = channels.shift();
     return axios.get(channel, {
         baseURL: baseUrl,
@@ -95,10 +97,10 @@ const getSessionChannelUrl = (searchStr, channels = []) => {
         }
     })
     .then(response => {
-        //console.info('getSessionChannelUrl response', response.data);
+        log.trace('getSessionChannelUrl response', response.data);
         let data = (response.data.channel_type === 'driver')?[response.data.name, response.data.driveroccurrence_urls[0].driver_tla, `${response.data.driveroccurrence_urls[0].driver_racingnumber}`]:[response.data.name];
         if ( data.find(item => item.toLowerCase().indexOf(searchStr.toLowerCase()) !== -1) !== undefined ) { return response.data.self }
-        //console.info(`Calling getSesssionChannelUrl(${searchStr}, ${channels})`);
+        log.trace(`Calling getSesssionChannelUrl(${searchStr}, ${channels})`);
         return getSessionChannelUrl(searchStr, channels);
     })
 }
@@ -107,7 +109,7 @@ const getItemUrl = (urlStr, searchStr) => {
     if ( authData.user !== undefined && authData.pass !== undefined) {
         return loginF1(authData.user, authData.pass)
             .then( token => {
-                console.info('token', token);
+                log.debug('token', token);
                 authData.jwt = token;
                 return (isF1tvEpisodeUrl(urlStr))?getEpisodeUrl(urlStr):getSessionUrl(urlStr, searchStr); 
             })
@@ -130,7 +132,7 @@ const loginF1 = (username, password) => {
     
     return axios.post('/v2/account/subscriber/authenticate/by-password', requestData, {baseURL: loginUrl, headers: requestHeaders })
         .then( response => {
-            //console.info(response);
+            log.trace(response);
             let requestData = {
                 'identity_provider_url': identityProviderUrl,
                 'access_token': response.data.data.subscriptionToken
@@ -141,8 +143,8 @@ const loginF1 = (username, password) => {
             return (response.data.token);
         })
         .catch( e => {
-            console.error('-------------------------------loginF1 Error-------------------------------------');
-            console.error(e);
+            log.error('-------------------------------loginF1 Error-------------------------------------');
+            log.error(e);
             return null;
         })
 }
@@ -158,7 +160,7 @@ const printSessionChannelList = (channels = []) => {
     })
     .then((response) => {
         let data = (response.data.channel_type === 'driver')?`name: ${response.data.name} number: ${response.data.driveroccurrence_urls[0].driver_racingnumber} tla: ${response.data.driveroccurrence_urls[0].driver_tla}`:`name: ${response.data.name}`;
-        console.info(data);
+        log.debug(data);
         return (channels.length > 0)?printSessionChannelList(channels):'';
     })
 }
@@ -166,7 +168,7 @@ const printSessionChannelList = (channels = []) => {
 const getSessionChannelList = (urlStr) => {
     let slug = getSlugName(urlStr);
     if (isF1tvEpisodeUrl(urlStr)) throw new Error('Video does not have multiple cameras available.');
-    console.info(`getSessionChannelList Slug is ${slug}`);
+    log.debug(`getSessionChannelList Slug is ${slug}`);
     return axios.get('/api/session-occurrence/', {
         baseURL: baseUrl,
         params: {
@@ -183,7 +185,7 @@ const getSessionChannelList = (urlStr) => {
         })
     })
     .then(response => {
-        //console.info(response.data);
+        log.trace(response.data);
         return printSessionChannelList(response.data.channel_urls);
     })
 }
@@ -191,8 +193,8 @@ const getSessionChannelList = (urlStr) => {
 const getTokenizedUrl = itemPath => {
     let isAsset = (itemPath.indexOf('assets') !== -1);
     let item =  (isAsset)?{'asset_url': itemPath}:{'channel_url': itemPath};
-    console.info('item', item);
-    console.info('authData', authData);
+    log.debug('item', item);
+    log.debug('authData', authData);
     let authHeader = {'Authorization': `JWT ${authData.jwt}`};
 
     return axios.post('/api/viewings/', item, {baseURL: baseUrl, headers: authHeader })
@@ -211,7 +213,8 @@ async function run() {
             audioStream: audioStream,
             outputDirectory: outputDir,
             username: f1Username,
-            password: f1Password
+            password: f1Password,
+            logLevel: logLevel
         } = yargs
                 .command('$0 <url>', 'Download a video', (yarg) => {
                     yarg
@@ -271,17 +274,25 @@ async function run() {
                             type: 'boolean',
                             desc: 'Provides a list of channels available from url (for videos with multiple cameras)',
                             default: false
+                        })
+                        .option('log-level', {
+                            alias: 'l',
+                            desc: 'set the log level',
+                            choices: ['trace', 'debug', 'info', 'warn', 'error'],
+                            default: 'info'
                         })    
                 })
                 .demandCommand()
                 .showHelpOnFail()
                 .parse()
 
-            //console.info(`channel-list is ${channelList} url is ${url}`);
-            if (!channelList) {
-                //console.info('finding url')
+            log.setLevel(logLevel);
 
-                console.info('User:', f1Username, 'Password:', f1Password);
+            log.trace(`channel-list is ${channelList} url is ${url}`);
+            if (!channelList) {
+                log.trace('finding url')
+
+                log.debug('User:', f1Username, 'Password:', f1Password);
 
                 authData ={
                     'user': f1Username,
@@ -291,36 +302,45 @@ async function run() {
 
                 getItemUrl(url, channel)
                 .then(item => {
-                    console.info('item:', item);
+                    log.debug('item:', item);
                     return getTokenizedUrl(item);
                 })
                 .then(item => {
-                    console.info('tokenized url:', item);
-                    //console.info(ffmpeg.path);
+                    log.debug('tokenized url:', item);
+                    log.trace(ffmpeg.path);
                     let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
                     if (outputDir !== null) {
-                        console.info('Outputting file to:', outputDir);
+                        log.debug('Outputting file to:', outputDir);
                         tsFile = outputDir + tsFile;
                     }
-                    console.info('tsFile:', tsFile);
-                    return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', tsFile], {});
-                    /*
-                    return ffmpeg(item)
-                        .inputOptions('-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:0:${audioStream}`, '-y')
+                    log.info('tsFile:', tsFile);
+                    //return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', tsFile], {});
+                    //*
+                    return ffmpeg()
+                        .input(item)
+                        .outputOptions('-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y')
+                        .on('start', commandLine => {
+                            log.info('Executing command:', commandLine);
+                        })
+                        .on('codecData', data => {
+                            log.info('File duration:', data.duration);
+                        })
                         .on('progress', info => {
-                            console.info('Progress:', info.percent, '%');
+                            let outStr = '\rFrames=' + `${info.frames}`.padStart(8) + ' Fps=' + `${info.currentFps}`.padStart(5) + 'fps Kbps=' + `${info.currentKbps}`.padStart(7) + 'Kbps Duration= ' + `${info.timemark}` +' Percent Complete=' + `${parseInt(info.percent)}`.padStart(3) + '%';
+                            process.stdout.write(outStr);
+                            log.trace('Progress:', info.percent, '%');
                         })
                         .on('error', e => {
-                            console.error('ffmpeg error:', e);
+                            log.error('ffmpeg error:', e);
                         })
                         .save(tsFile);
-                    */
+                    //*/
                 })
-                .catch(e => console.error('getItemUrl Error:', e));
+                .catch(e => log.error('getItemUrl Error:', e));
             }
             if (channelList) {
                 getSessionChannelList(url)
-                .catch(e => console.error('getSessionChannelList Error', e.message));
+                .catch(e => log.error('getSessionChannelList Error', e.message));
             }
 
 
@@ -328,7 +348,7 @@ async function run() {
                 
     }
     catch (error) {
-        console.error('Big Error:', error.message);
+        log.error('Big Error:', error.message);
     }
 }
 
