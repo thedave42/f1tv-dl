@@ -82,7 +82,7 @@ const getSessionUrl = (urlStr, searchStr='wif') => {
         })
     })
     .then(response => {
-        log.info('looking up channel');
+        log.info('Looking up channel for ' + makeItGreen(searchStr));
         return getSessionChannelUrl(searchStr, response.data.channel_urls);
     })
 }
@@ -98,7 +98,9 @@ const getSessionChannelUrl = (searchStr, channels = []) => {
     })
     .then(response => {
         log.trace('getSessionChannelUrl response', response.data);
+        if ( response.data.name === undefined ) { throw new Error('No channel matches ' + makeItGreen(searchStr)); }
         let data = (response.data.channel_type === 'driver')?[response.data.name, response.data.driveroccurrence_urls[0].driver_tla, `${response.data.driveroccurrence_urls[0].driver_racingnumber}`]:[response.data.name];
+        log.debug('!!!!~!~~~: ', data);
         if ( data.find(item => item.toLowerCase().indexOf(searchStr.toLowerCase()) !== -1) !== undefined ) { return response.data.self }
         log.trace(`Calling getSesssionChannelUrl(${searchStr}, ${channels})`);
         return getSessionChannelUrl(searchStr, channels);
@@ -163,7 +165,7 @@ const printSessionChannelList = (channels = []) => {
         }
     })
     .then((response) => {
-        let data = (response.data.channel_type === 'driver')?`name: ${makeItGreen(response.data.name)}`.padEnd(37) + `number: ${makeItGreen(response.data.driveroccurrence_urls[0].driver_racingnumber)}`.padEnd(25) + `tla: ${makeItGreen(response.data.driveroccurrence_urls[0].driver_tla)}`:`name: ${makeItGreen(response.data.name)}`;
+        let data = (response.data.channel_type === 'driver')?`name: ${makeItGreen(response.data.name)}`.padEnd(37) + `number: ${makeItGreen(response.data.driveroccurrence_urls[0].driver_racingnumber)}`.padEnd(22) + `tla: ${makeItGreen(response.data.driveroccurrence_urls[0].driver_tla)}`:`name: ${makeItGreen(response.data.name)}`;
         log.info(data);
         return (channels.length > 0)?printSessionChannelList(channels):'';
     })
@@ -317,22 +319,22 @@ async function run() {
                         log.debug('Outputting file to:', outputDir);
                         tsFile = outputDir + tsFile;
                     }
-                    log.info('tsFile:', tsFile);
+                    log.info('Output file:', makeItGreen(tsFile));
                     //return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', tsFile], {});
                     //*
                     return ffmpeg()
                         .input(item)
                         .outputOptions('-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y')
                         .on('start', commandLine => {
-                            log.info('Executing command:', commandLine);
+                            log.info('Executing command:', makeItGreen(commandLine));
                         })
                         .on('codecData', data => {
-                            log.info('File duration:', data.duration);
+                            log.info(data.streams);
+                            log.info('File duration:', makeItGreen(data.duration));
                         })
                         .on('progress', info => {
-                            let outStr = '\rFrames=' + `${info.frames}`.padStart(8) + ' Fps=' + `${info.currentFps}`.padStart(5) + 'fps Kbps=' + `${info.currentKbps}`.padStart(7) + 'Kbps Duration= ' + `${info.timemark}` +' Percent Complete=' + `${parseInt(info.percent)}`.padStart(3) + '%';
+                            let outStr = '\rFrames=' + makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration= ' + makeItGreen(`${info.timemark}`) +' Percent Complete=' + makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
                             process.stdout.write(outStr);
-                            log.trace('Progress:', info.percent, '%');
                         })
                         .on('error', e => {
                             log.error('ffmpeg error:', e);
