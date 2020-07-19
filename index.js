@@ -314,22 +314,23 @@ async function run() {
                 .then(item => {
                     log.debug('tokenized url:', item);
                     log.trace(ffmpeg.path);
-                    let tsFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.ts`;
+                    let outFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.mp4`;
                     if (outputDir !== null) {
                         log.debug('Outputting file to:', outputDir);
-                        tsFile = outputDir + tsFile;
+                        outFile = outputDir + outFile;
                     }
-                    log.info('Output file:', makeItGreen(tsFile));
-                    //return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', tsFile], {});
+                    log.info('Output file:', makeItGreen(outFile));
+                    //return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', outFile], {});
                     //*
                     return ffmpeg()
                         .input(item)
-                        .outputOptions('-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y')
+                        .outputOptions('-c', 'copy', '-bsf:a', 'aac_adtstoasc', '-movflags', 'faststart', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y')
                         .on('start', commandLine => {
                             log.info('Executing command:', makeItGreen(commandLine));
                         })
                         .on('codecData', data => {
-                            log.info(data.streams);
+                            //log.info(data.video);
+                            //log.info(data.audio)
                             log.info('File duration:', makeItGreen(data.duration));
                         })
                         .on('progress', info => {
@@ -339,7 +340,7 @@ async function run() {
                         .on('error', e => {
                             log.error('ffmpeg error:', e);
                         })
-                        .save(tsFile);
+                        .save(outFile);
                     //*/
                 })
                 .catch(e => log.error('getItemUrl Error:', e));
