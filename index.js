@@ -60,6 +60,10 @@ const getEpisodeUrl = urlStr => {
     .then(response => {
         return response.data.objects.shift().items.shift();
     })
+    .catch(e => {
+        log.error("Error with Episode URL lookup");
+        throw e;
+    })
 }
 
 const getSessionUrl = (urlStr, searchStr='wif') => {
