@@ -324,8 +324,6 @@ async function run() {
                         outFile = outputDir + outFile;
                     }
                     log.info('Output file:', makeItGreen(outFile));
-                    //return pour(ffmpeg.path, ['-i', item, '-loglevel', '+level', '-c', 'copy', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y', outFile], {});
-                    //*
                     return ffmpeg()
                         .input(item)
                         .outputOptions('-c', 'copy', '-bsf:a', 'aac_adtstoasc', '-movflags', 'faststart', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y')
@@ -333,29 +331,30 @@ async function run() {
                             log.info('Executing command:', makeItGreen(commandLine));
                         })
                         .on('codecData', data => {
-                            //log.info(data.video);
-                            //log.info(data.audio)
+                            log.debug(data.video);
+                            log.debug(data.audio)
                             log.info('File duration:', makeItGreen(data.duration));
                         })
                         .on('progress', info => {
                             let outStr = '\rFrames=' + makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration= ' + makeItGreen(`${info.timemark}`) +' Percent Complete=' + makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
                             process.stdout.write(outStr);
                         })
+                        .on('end', () => {
+                            log.info('\nDownload complete.');
+                        })
                         .on('error', e => {
                             log.error('ffmpeg error:', e);
                         })
                         .save(outFile);
-                    //*/
                 })
                 .catch(e => log.error('getItemUrl Error:', e));
+
             }
             if (channelList) {
                 getSessionChannelList(url)
                 .catch(e => log.error('getSessionChannelList Error', e.message));
             }
-
-
-                    
+                 
                 
     }
     catch (error) {
