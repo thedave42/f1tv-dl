@@ -318,7 +318,7 @@ async function run() {
                 .then(item => {
                     log.debug('tokenized url:', item);
                     log.trace(ffmpeg.path);
-                    let outFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.ts`:`${getSlugName(url)}-${channel.split(' ').shift()}.mp4`;
+                    let outFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.mp4`:`${getSlugName(url)}-${channel.split(' ').shift()}.mp4`;
                     if (outputDir !== null) {
                         log.debug('Outputting file to:', outputDir);
                         outFile = outputDir + outFile;

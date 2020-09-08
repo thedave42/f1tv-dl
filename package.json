@@ -18,7 +18,7 @@
     "loglevel": "^1.6.7",
     "moment": "^2.24.0",
     "std-pour": "^1.1.0",
-    "yargs": "^15.0.2"
+    "yargs": "^15.4.1"
   },
   "devDependencies": {
     "eslint": "^6.7.1",
