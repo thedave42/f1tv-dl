@@ -1,9 +1,6 @@
 const yargs = require('yargs');
 const axios = require('axios');
 const log = require('loglevel');
-//const moment = require('moment');
-//const { pour } = require('std-pour');
-//const ffmpeg = require('ffmpeg-cli');
 const ffmpeg = require('fluent-ffmpeg');
 
 const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
