@@ -7,7 +7,7 @@
     "f1tv-dl": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,8 @@
     "ffmpeg-cli": "github:thedave42/ffmpeg-cli",
     "fluent-ffmpeg": "git+https://github.com/thedave42/node-fluent-ffmpeg.git",
     "loglevel": "^1.6.7",
+    "minimist": "^1.2.5",
+    "mkdirp": "^1.0.4",
     "moment": "^2.24.0",
     "std-pour": "^1.1.0",
     "yargs": "^15.4.1"
@@ -26,6 +28,7 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.5.2"
   }
 }
