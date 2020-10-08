@@ -15,7 +15,7 @@
     "axios": "^0.19.0",
     "ffmpeg-cli": "github:thedave42/ffmpeg-cli",
     "fluent-ffmpeg": "git+https://github.com/thedave42/node-fluent-ffmpeg.git",
-    "loglevel": "^1.6.7",
+    "loglevel": "^1.7.0",
     "minimist": "^1.2.5",
     "mkdirp": "^1.0.4",
     "moment": "^2.24.0",
