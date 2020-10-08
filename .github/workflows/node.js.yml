@@ -10,7 +10,7 @@ on:
 jobs:
   build:
 
-    runs-on: wiondows-2016
+    runs-on: windows-2016
 
     strategy:
       matrix:
