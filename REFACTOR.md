@@ -1,3 +1,4 @@
+```
 Command line
     - channel list
     - video download
@@ -43,11 +44,12 @@ Command line
                                         if there's no channel name, we're done.  no channel matches the searchStr
                                         response data object is based on channel type, so based on channel type store response data in an array called data
                                         do a case insensitive search on the data array to see if the data contains our search string
-                                        if it does, return the data and we're done, exit here
+                                        if it does, return the data and we're done, exit here // return the url
                                         check the next channel in the list to see if it matches our search string
         - then
-            'item' now contains the URL to the content
-            
+            'item' now contains the URL to the content, and we have to get a tokenized url to the stream link
+```
+
 
 
                                         
