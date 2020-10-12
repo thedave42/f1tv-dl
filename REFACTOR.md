@@ -5,7 +5,7 @@ Command line
         - set authdata object
             -user, pass, jwt
         - getItemUrl
-            if there is user/pass, call loginF1
+            if there is user/pass, call loginF1 // this should no longer an an IF, need to not allow requests w/o username & pass
                 axios.post to auth api to request auth by password
                 then
                     save identity provider url and access token
@@ -48,6 +48,21 @@ Command line
                                         check the next channel in the list to see if it matches our search string
         - then
             'item' now contains the URL to the content, and we have to get a tokenized url to the stream link
+            call getTokenizedUrl, pass item
+                check if item is an asset
+                set the post parameters based on whether or not this is true
+                create authHeader object with Authorization header via jwt
+                axios.post
+                    params: param values set in variable
+                then
+                    return data is different based on whether item is asset
+                    return tokenized url
+        - then
+            now we have the tokenized url and can call ffmpeg
+            set the outfile name
+            check if there's an output directory specified in the parameters and if so add it to the output file path
+            call ffmpeg
+
 ```
 
 
