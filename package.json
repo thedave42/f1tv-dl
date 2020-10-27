@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.20.0",
+    "dotenv": "^8.2.0",
     "fluent-ffmpeg": "git+https://github.com/thedave42/node-fluent-ffmpeg.git",
     "loglevel": "^1.7.0",
     "minimist": "^1.2.5",

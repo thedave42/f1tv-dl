@@ -1,7 +1,12 @@
+#!/usr/bin/env node
+
+require('dotenv').config();
+
 const yargs = require('yargs');
 const axios = require('axios');
 const log = require('loglevel');
 const ffmpeg = require('fluent-ffmpeg');
+const path = require('path');
 
 const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
 const baseUrl = 'https://f1tv.formula1.com';
@@ -258,10 +263,11 @@ async function run() {
                             desc: 'Specify a directory for the downloaded file',
                             default: null,
                             alias: 'o',
+                            default: process.env.F1TV_OUTDIR || null,
                             coerce: outDir => {
                                 if (outDir !== null) {
-                                    if (!outDir.endsWith('\\')) {
-                                        outDir = outDir + '\\';
+                                    if (!outDir.endsWith(path.sep)) {
+                                        outDir = outDir + path.sep;
                                     }
                                 }
                                 return outDir;
@@ -270,12 +276,14 @@ async function run() {
                         .option('username', {
                             type: 'string',
                             desc: 'F1TV User name',
-                            alias: 'U'
+                            alias: 'U',
+                            default: process.env.F1TV_USER || null
                         })
                         .option('password', {
                             type: 'string',
                             desc: 'F1TV password',
-                            alias: 'P'
+                            alias: 'P',
+                            default: process.env.F1TV_PASS || null
                         })
                         .option('channel-list', {
                             type: 'boolean',
@@ -294,6 +302,7 @@ async function run() {
                 .parse()
 
             log.setLevel(logLevel);
+            log.trace(process.env);
 
             log.trace(`channel-list is ${channelList} url is ${url}`);
             if (!channelList) {

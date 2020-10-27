@@ -1,0 +1,13 @@
+version: "3.8"
+services: 
+    f1tv-dl:
+        environment: 
+            - F1TV_USER=${F1TV_USER}
+            - F1TV_PASS=${F1TV_PASS}
+            - F1TV_OUTDIR=${F1TV_OUTDIR}
+        build: 
+            context: .
+        image: f1tv-dl:latest
+        volumes: 
+            - ./download:/download
+
