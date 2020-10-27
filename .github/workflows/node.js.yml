@@ -36,7 +36,7 @@ jobs:
       uses: PackagrIO/action-bumpr-generic@v0.0.1
       with:
         version_bump_type: patch
-        version_metadata_path: ./VERSION
+        version_metadata_path: VERSION
 
     - 
       run: echo version is ${{ steps.semver.outputs.release_version }}
@@ -47,7 +47,8 @@ jobs:
         author_name: the Dave
         author_email: dave@digitalnoise.net
         message: "Bump release version in VERSION file to ${{ steps.semver.outputs.release_version }}"
-        add: "./VERSION"
+        tag: ${{steps.bump_version.outputs.release_version}}
+        cwd: ${{ env.PROJECT_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
