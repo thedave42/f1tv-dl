@@ -81,7 +81,7 @@ jobs:
         context: .
         push: true
         tags: |
-          docker.pkg.github.com/${{ github.repository }}:latest
-          docker.pkg.github.com/${{ github.repository }}:${{ steps.semver.outputs.release_version }}
+          docker.pkg.github.com/${{ github.repository }}/f1tv-dl-docker:latest
+          docker.pkg.github.com/${{ github.repository }}/f1tv-dl-docker:${{ steps.semver.outputs.release_version }}
 
 
