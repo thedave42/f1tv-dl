@@ -7,6 +7,11 @@ on:
   push:
     branches: 
       - code-refactor
+    inputs:
+      version_bump_type:
+        description: 'Version Bump Type (major, minor, patch)'
+        required: true
+        default: 'patch'
   
   pull_request:
     branches: 
@@ -35,13 +40,14 @@ jobs:
       id: semver
       uses: PackagrIO/action-bumpr-generic@v0.0.1
       with:
-        version_bump_type: patch
+        version_bump_type: ${{ github.event.inputs.version_bump_type }}
         version_metadata_path: VERSION
 
     - 
       run: echo version is ${{ steps.semver.outputs.release_version }}
 
-    - name: Commit changes
+    - 
+      name: Commit changes
       uses: EndBug/add-and-commit@v5
       with:
         author_name: the Dave
