@@ -40,6 +40,16 @@ jobs:
 
     - 
       run: echo version is ${{ steps.semver.outputs.release_version }}
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v5
+      with:
+        author_name: the Dave
+        author_email: dave@digitalnoise.net
+        message: "Bump release version in VERSION file to ${{ steps.semver.outputs.release_version }}"
+        add: "./VERSION"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     -
       run: npm ci
