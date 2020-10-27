@@ -4,9 +4,9 @@
 name: Node.js CI
 
 on:
- # push:
- #   branches: 
- #     - main
+  push:
+    branches: 
+      - code-refactor
   
   pull_request:
     branches: 
@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [14.x]
 
     steps:
     - 
