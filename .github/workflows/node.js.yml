@@ -22,9 +22,23 @@ jobs:
         node-version: [10.x, 12.x, 14.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - 
+      uses: actions/checkout@v2
+    - 
+      name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
+        
+    - 
+      name: Generic Version Bumpr
+      id: semver
+      uses: PackagrIO/action-bumpr-generic@v0.0.1
+      with:
+        version_bump_type: minor
+
+    - 
+      run: |
+        echo version is ${{ steps.semver.outputs.release_version }}
+        npm ci
+
