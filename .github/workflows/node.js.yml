@@ -8,7 +8,10 @@ on:
     branches: 
       - code-refactor
     inputs:
-      version_bump_type: 'patch'
+      version_bump_type: 
+          description: 'Version Bump Type (major, minor, patch)'
+          required: true
+          default: 'patch'
   
   pull_request:
     branches: 
