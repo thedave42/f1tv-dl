@@ -9,9 +9,9 @@ services:
         build: 
             context: .
         image: ghcr.io/thedave42/f1tv-dl-docker:latest
+        entrypoint: ["/bin/sh", "run-azure.sh"]
         volumes: 
             - fileshare:/download
-        entrypoint: /bin/sh run-azure.sh    
 volumes:
     fileshare:
         driver: azure_file
