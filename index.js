@@ -228,7 +228,7 @@ async function run() {
             password: f1Password,
             logLevel: logLevel
         } = yargs
-                .command('$0 <url>', 'Download a video', (yarg) => {
+                .command('$0 [url]', 'Download a video', (yarg) => {
                     yarg
                         .positional('url', {
                             type: 'string',

@@ -5,11 +5,13 @@ services:
             - F1TV_USER=${F1TV_USER}
             - F1TV_PASS=${F1TV_PASS}
             - F1TV_OUTDIR=${F1TV_OUTDIR}
+            - F1TV_URL=https://f1tv.formula1.com/en/current-season/portuguese-grand-prix/2020-portuguese-grand-prix-formula-1-race
         build: 
             context: .
-        image: ghcr.io/thedave42/f1tv-dl-docker:latest
+        image: ghcr.io/thedave42/f1tv-dl-docker:0.0.13
         volumes: 
-            - fileshare:/download    
+            - fileshare:/download
+        entrypoint: f1tv-dl $F1TV_URL    
 volumes:
     fileshare:
         driver: azure_file
