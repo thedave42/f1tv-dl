@@ -8,4 +8,4 @@ COPY . /f1tv
 
 RUN npm i -g
 
-ENTRYPOINT [ "f1tv-dl" ]
+ENTRYPOINT [ "/bin/sh", "run.sh" ]

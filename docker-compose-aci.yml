@@ -1,15 +1,11 @@
 version: "3.8"
 services: 
     f1tv-dl:
+        env_file:
+            - ./.env 
         environment: 
-            - F1TV_USER=${F1TV_USER}
-            - F1TV_PASS=${F1TV_PASS}
-            - F1TV_OUTDIR=${F1TV_OUTDIR}
-            - F1TV_URL=https://f1tv.formula1.com/en/current-season/portuguese-grand-prix/2020-portuguese-grand-prix-formula-1-race
-        build: 
-            context: .
+             - F1TV_URL=https://f1tv.formula1.com/en/current-season/portuguese-grand-prix/2020-portuguese-grand-prix-formula-1-race
         image: ghcr.io/thedave42/f1tv-dl-docker:latest
-        entrypoint: ["/bin/sh", "run-azure.sh"]
         volumes: 
             - fileshare:/download
 volumes:
