@@ -228,12 +228,11 @@ async function run() {
             password: f1Password,
             logLevel: logLevel
         } = yargs
-                .command('$0 [url]', 'Download a video', (yarg) => {
+                .command('$0 <url>', 'Download a video', (yarg) => {
                     yarg
                         .positional('url', {
                             type: 'string',
                             desc: 'The f1tv url for the video',
-                            default: process.env.F1TV_URL || null,
                             coerce: urlStr => {
                                 if (isF1tvUrl(urlStr)) {
                                     return urlStr;

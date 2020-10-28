@@ -8,10 +8,10 @@ services:
             - F1TV_URL=https://f1tv.formula1.com/en/current-season/portuguese-grand-prix/2020-portuguese-grand-prix-formula-1-race
         build: 
             context: .
-        image: ghcr.io/thedave42/f1tv-dl-docker:0.0.13
+        image: ghcr.io/thedave42/f1tv-dl-docker:latest
         volumes: 
             - fileshare:/download
-        entrypoint: f1tv-dl $F1TV_URL    
+        entrypoint: /bin/sh run-azure.sh    
 volumes:
     fileshare:
         driver: azure_file
