@@ -233,6 +233,7 @@ async function run() {
                         .positional('url', {
                             type: 'string',
                             desc: 'The f1tv url for the video',
+                            default: process.env.F1TV_URL || null,
                             coerce: urlStr => {
                                 if (isF1tvUrl(urlStr)) {
                                     return urlStr;

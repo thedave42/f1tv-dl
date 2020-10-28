@@ -1,0 +1,18 @@
+version: "3.8"
+services: 
+    f1tv-dl:
+        environment: 
+            - F1TV_USER=${F1TV_USER}
+            - F1TV_PASS=${F1TV_PASS}
+            - F1TV_OUTDIR=${F1TV_OUTDIR}
+        build: 
+            context: .
+        image: ghcr.io/thedave42/f1tv-dl-docker:latest
+        volumes: 
+            - fileshare:/download    
+volumes:
+    fileshare:
+        driver: azure_file
+        driver_opts: 
+            share_name: thedave42fileshare
+            storage_account_name: thedave42storage

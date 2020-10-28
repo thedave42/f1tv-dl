@@ -2,5 +2,5 @@ node_modules
 *.ts
 *.mp4
 download
-.env
+.env*
 token.txt

@@ -10,4 +10,3 @@ services:
         image: f1tv-dl:latest
         volumes: 
             - ./download:/download
-
