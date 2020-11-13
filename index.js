@@ -261,7 +261,6 @@ async function run() {
                         .option('output-directory', {
                             type: 'string',
                             desc: 'Specify a directory for the downloaded file',
-                            default: null,
                             alias: 'o',
                             default: process.env.F1TV_OUTDIR || null,
                             coerce: outDir => {
