@@ -7,6 +7,7 @@ const axios = require('axios');
 const log = require('loglevel');
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
+const fs = require('fs');
 
 const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
 const baseUrl = 'https://f1tv.formula1.com';
@@ -14,7 +15,6 @@ const loginUrl = 'https://api.formula1.com/';
 const f1TvAuthUrl = 'https://f1tv-api.formula1.com';
 const loginDistributionChannel = 'd861e38f-05ea-4063-8776-a7e2b6d885a4';
 const identityProviderUrl = '/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/';
-const auth = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1ZyI6IlVTQSIsImVtYWlsIjpudWxsLCJleHAiOjE1ODMzNjUxNzEsImlkIjoxODM4MDAzM30.lgSa79135Pxu04F_f-oQkDUP81zqsQTWpN7Jn3v-Wbw';
 let authData;
 
 const isUrl = string => {
@@ -114,7 +114,7 @@ const getSessionChannelUrl = (searchStr, channels = []) => {
 }
 
 const getItemUrl = (urlStr, searchStr) => {
-    if ( authData.user !== undefined && authData.pass !== undefined) {
+    if ( authData.user !== null && authData.pass !== null) {
         return loginF1(authData.user, authData.pass)
             .then( token => {
                 log.debug('token', token);
@@ -128,6 +128,7 @@ const getItemUrl = (urlStr, searchStr) => {
 }
 
 const loginF1 = (username, password) => {
+    log.debug(`loginF1 called with username ${username}`);
     let requestData = {
         'Login': username,
         'Password': password,
@@ -135,7 +136,8 @@ const loginF1 = (username, password) => {
     };
     let requestHeaders = {
         'apiKey': apiKey,
-        'TE': 'Trailers' 
+        'TE': 'Trailers',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
     }
     
     return axios.post('/v2/account/subscriber/authenticate/by-password', requestData, {baseURL: loginUrl, headers: requestHeaders })
@@ -148,6 +150,11 @@ const loginF1 = (username, password) => {
             return axios.post('/agl/1.0/unk/en/all_devices/global/authenticate', requestData, {baseURL: f1TvAuthUrl});
         })
         .then( response => {
+            try {
+                fs.writeFileSync('.f1tvtoken', response.data.token);
+            } catch (e) {
+                log.error('Token file was not saved.');
+            }
             return (response.data.token);
         })
         .catch( e => {
@@ -217,6 +224,7 @@ run();
 
 async function run() {
     try {
+        log.info(process.env);
         const {
             url: url,
             channel: channel,
@@ -308,6 +316,15 @@ async function run() {
                 log.trace('finding url')
 
                 log.debug('User:', f1Username, 'Password:', f1Password);
+                let auth;
+
+                try {
+                    auth = fs.readFileSync('.f1tvtoken', 'utf-8');
+                }
+                catch (err) {
+                    auth = null;
+                    log.info('No token file found.');
+                }
 
                 authData ={
                     'user': f1Username,
