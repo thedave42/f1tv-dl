@@ -19,7 +19,8 @@ on:
 
 jobs:
   build:
-
+    
+    # Use self-hosted linux runner deployed on Azure
     runs-on: [self-hosted, linux, x64, azure]
 
     strategy:
