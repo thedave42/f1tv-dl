@@ -3,16 +3,7 @@
 
 name: Node.js CI
 
-on:
-  push:
-    branches: 
-      - code-refactor
-    inputs:
-      version_bump_type: 
-          description: 'Version Bump Type (major, minor, patch)'
-          required: true
-          default: 'patch'
-  
+on:  
   pull_request:
     branches: 
       - main
