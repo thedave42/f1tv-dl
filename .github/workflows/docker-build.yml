@@ -7,12 +7,7 @@ on:
   release:
     branches: 
       - main
-    inputs:
-      version_bump_type: 
-          description: 'Version Bump Type (major, minor, patch)'
-          required: true
-          default: 'minor'
-
+      
 jobs:
   build:
     
