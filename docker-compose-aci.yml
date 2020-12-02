@@ -1,6 +1,7 @@
 version: "3.8"
 services: 
     f1tv-dl:
+        restart: "no"
         env_file:
             - ./.env 
         environment: 
