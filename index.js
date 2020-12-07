@@ -231,6 +231,7 @@ async function run() {
             channelList: channelList,
             programStream: programStream,
             audioStream: audioStream,
+            format: format,
             outputDirectory: outputDir,
             username: f1Username,
             password: f1Password,
@@ -266,7 +267,13 @@ async function run() {
                             default: '0',
                             alias: 'a'
                         })
-                        .option('output-directory', {
+                        .option('format', {
+                            type: 'string',
+                            desc: 'Specify mp4 or TS output (default mp4)',
+                            choices: ['mp4', 'ts'],
+                            default: 'mp4',
+                            alias: 'f'
+                        })                        .option('output-directory', {
                             type: 'string',
                             desc: 'Specify a directory for the downloaded file',
                             alias: 'o',
@@ -340,15 +347,37 @@ async function run() {
                 .then(item => {
                     log.debug('tokenized url:', item);
                     log.trace(ffmpeg.path);
-                    let outFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.mp4`:`${getSlugName(url)}-${channel.split(' ').shift()}.mp4`;
+                    let ext = (format == "mp4")?'mp4':'ts';
+                    let outFile = (isF1tvEpisodeUrl(url))?`${getSlugName(url)}.${ext}`:`${getSlugName(url)}-${channel.split(' ').shift()}.${ext}`;
                     if (outputDir !== null) {
                         log.debug('Outputting file to:', outputDir);
                         outFile = outputDir + outFile;
                     }
                     log.info('Output file:', makeItGreen(outFile));
+                    let options = (format == "mp4")?
+                        [
+                            '-c', 
+                            'copy', 
+                            '-bsf:a', 
+                            'aac_adtstoasc', 
+                            '-movflags', 
+                            'faststart', 
+                            '-map', 
+                            `0:p:${programStream}:v`, 
+                            '-map', `0:p:${programStream}:${audioStream}`, 
+                            '-y'
+                        ]:
+                        [
+                            '-c', 
+                            'copy', 
+                            '-map', 
+                            `0:p:${programStream}:v`, 
+                            '-map', `0:p:${programStream}:${audioStream}`, 
+                            '-y'                            
+                        ];
                     return ffmpeg()
                         .input(item)
-                        .outputOptions('-c', 'copy', '-bsf:a', 'aac_adtstoasc', '-movflags', 'faststart', '-map', `0:p:${programStream}:v`, '-map', `0:p:${programStream}:${audioStream}`, '-y')
+                        .outputOptions(options)
                         .on('start', commandLine => {
                             log.info('Executing command:', makeItGreen(commandLine));
                         })
