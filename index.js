@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('dotenv').config();
+const config = require('./lib/config');
 
 const yargs = require('yargs');
 const axios = require('axios');
@@ -9,45 +9,15 @@ const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
 const fs = require('fs');
 
-const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
-const baseUrl = 'https://f1tv.formula1.com';
-const loginUrl = 'https://api.formula1.com/';
-const f1TvAuthUrl = 'https://f1tv-api.formula1.com';
-const loginDistributionChannel = 'd861e38f-05ea-4063-8776-a7e2b6d885a4';
-const identityProviderUrl = '/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/';
+const { isF1tvUrl, isF1tvEpisodeUrl, getSlugName } = require('./lib/f1tv-validator');
+
+const apiKey = config.API_KEY;
+const baseUrl = config.BASE_URL;
+const loginUrl = config.LOGIN_URL;
+const f1TvAuthUrl = config.AUTH_URL;
+const loginDistributionChannel = config.DIST_CHANNEL;
+const identityProviderUrl = config.F1TV_IDP;
 let authData;
-
-const isUrl = string => {
-    try { return Boolean(new URL(string));}
-    catch (e) { return false; }
-}
-
-const isF1tvUrl = urlStr => {
-    try {
-        if (isUrl(urlStr)) {
-            let url = new URL(urlStr);
-            return url.host.toLowerCase().indexOf('f1tv') !== -1 &&
-                ['current-season', 'archive', 'episode'].find(item => url.pathname.toLowerCase().indexOf(item) !== -1);
-        }
-        return false;
-    }
-    catch (e) { return false; }
-}
-
-const isF1tvEpisodeUrl = urlStr => {
-    try {
-        if (isUrl(urlStr)) {
-            return new URL(urlStr).pathname.toLowerCase().indexOf('episode') !== -1;
-        }
-        return false;
-    }
-    catch (e) { return false; }
-}
-
-const getSlugName = urlStr => {
-    try { return new URL(urlStr).pathname.split('/').pop(); }
-    catch (e) { return undefined; }
-}
 
 const getEpisodeUrl = urlStr => {
     let slug = getSlugName(urlStr);

@@ -3,6 +3,6 @@ node_modules
 *.mp4
 download
 .env*
-.f1token
+.f1tvtoken
 data.json
 test-datastore.js
