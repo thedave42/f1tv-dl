@@ -1,53 +1,25 @@
 #!/usr/bin/env node
 
-require('dotenv').config();
+const config = require('./lib/config');
 
 const yargs = require('yargs');
 const axios = require('axios');
 const log = require('loglevel');
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
-const fs = require('fs');
+const DataStore = require('./lib/secure-local-data');
 
-const apiKey = 'fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7';
-const baseUrl = 'https://f1tv.formula1.com';
-const loginUrl = 'https://api.formula1.com/';
-const f1TvAuthUrl = 'https://f1tv-api.formula1.com';
-const loginDistributionChannel = 'd861e38f-05ea-4063-8776-a7e2b6d885a4';
-const identityProviderUrl = '/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/';
+const { isF1tvUrl, isF1tvEpisodeUrl, getSlugName } = require('./lib/f1tv-validator');
+
+const apiKey = config.API_KEY;
+const baseUrl = config.BASE_URL;
+const loginUrl = config.LOGIN_URL;
+const f1TvAuthUrl = config.AUTH_URL;
+const loginDistributionChannel = config.DIST_CHANNEL;
+const identityProviderUrl = config.F1TV_IDP;
+const ds = new DataStore(config.DS_FILENAME);
+
 let authData;
-
-const isUrl = string => {
-    try { return Boolean(new URL(string));}
-    catch (e) { return false; }
-}
-
-const isF1tvUrl = urlStr => {
-    try {
-        if (isUrl(urlStr)) {
-            let url = new URL(urlStr);
-            return url.host.toLowerCase().indexOf('f1tv') !== -1 &&
-                ['current-season', 'archive', 'episode'].find(item => url.pathname.toLowerCase().indexOf(item) !== -1);
-        }
-        return false;
-    }
-    catch (e) { return false; }
-}
-
-const isF1tvEpisodeUrl = urlStr => {
-    try {
-        if (isUrl(urlStr)) {
-            return new URL(urlStr).pathname.toLowerCase().indexOf('episode') !== -1;
-        }
-        return false;
-    }
-    catch (e) { return false; }
-}
-
-const getSlugName = urlStr => {
-    try { return new URL(urlStr).pathname.split('/').pop(); }
-    catch (e) { return undefined; }
-}
 
 const getEpisodeUrl = urlStr => {
     let slug = getSlugName(urlStr);
@@ -151,7 +123,8 @@ const loginF1 = (username, password) => {
         })
         .then( response => {
             try {
-                fs.writeFileSync('.f1tvtoken', response.data.token);
+                //fs.writeFileSync('.f1tvtoken', response.data.token);
+                ds.add('token', response.data.token);
             } catch (e) {
                 log.error('Token file was not saved.');
             }
@@ -159,7 +132,7 @@ const loginF1 = (username, password) => {
         })
         .catch( e => {
             log.error('-------------------------------loginF1 Error-------------------------------------');
-            log.error(e);
+            log.error(e.message);
             return null;
         })
 }
@@ -322,16 +295,19 @@ async function run() {
             if (!channelList) {
                 log.trace('finding url')
 
-                log.debug('User:', f1Username, 'Password:', f1Password);
+                log.debug('User:', f1Username);
                 let auth;
 
                 try {
-                    auth = fs.readFileSync('.f1tvtoken', 'utf-8');
+                    //auth = fs.readFileSync('.f1tvtoken', 'utf-8');
+                    auth = await ds.get('token');
                 }
                 catch (err) {
                     auth = null;
                     log.info('No token file found.');
                 }
+
+                log.info(auth);
 
                 authData ={
                     'user': f1Username,
@@ -398,7 +374,7 @@ async function run() {
                         })
                         .save(outFile);
                 })
-                .catch(e => log.error('getItemUrl Error:', e));
+                .catch(e => log.error('getItemUrl Error:', e.message));
 
             }
             if (channelList) {
