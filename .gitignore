@@ -4,3 +4,5 @@ node_modules
 download
 .env*
 .f1token
+data.json
+test-datastore.js
