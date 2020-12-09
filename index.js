@@ -295,7 +295,7 @@ async function run() {
             if (!channelList) {
                 log.trace('finding url')
 
-                log.debug('User:', f1Username, 'Password:', f1Password);
+                log.debug('User:', f1Username);
                 let auth;
 
                 try {
