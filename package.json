@@ -28,5 +28,10 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.2",
     "jest": "^26.6.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thedave42/f1tv-dl.git"
+  },
+  "homepage": "https://github.com/thedave42/f1tv-dl#readme"
 }
