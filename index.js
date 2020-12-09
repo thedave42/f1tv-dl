@@ -7,7 +7,7 @@ const axios = require('axios');
 const log = require('loglevel');
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
-const fs = require('fs');
+const DataStore = require('./lib/secure-local-data');
 
 const { isF1tvUrl, isF1tvEpisodeUrl, getSlugName } = require('./lib/f1tv-validator');
 
@@ -17,6 +17,8 @@ const loginUrl = config.LOGIN_URL;
 const f1TvAuthUrl = config.AUTH_URL;
 const loginDistributionChannel = config.DIST_CHANNEL;
 const identityProviderUrl = config.F1TV_IDP;
+const ds = new DataStore(config.DS_FILENAME);
+
 let authData;
 
 const getEpisodeUrl = urlStr => {
@@ -121,7 +123,8 @@ const loginF1 = (username, password) => {
         })
         .then( response => {
             try {
-                fs.writeFileSync('.f1tvtoken', response.data.token);
+                //fs.writeFileSync('.f1tvtoken', response.data.token);
+                ds.add('token', response.data.token);
             } catch (e) {
                 log.error('Token file was not saved.');
             }
@@ -129,7 +132,7 @@ const loginF1 = (username, password) => {
         })
         .catch( e => {
             log.error('-------------------------------loginF1 Error-------------------------------------');
-            log.error(e);
+            log.error(e.message);
             return null;
         })
 }
@@ -296,12 +299,15 @@ async function run() {
                 let auth;
 
                 try {
-                    auth = fs.readFileSync('.f1tvtoken', 'utf-8');
+                    //auth = fs.readFileSync('.f1tvtoken', 'utf-8');
+                    auth = await ds.get('token');
                 }
                 catch (err) {
                     auth = null;
                     log.info('No token file found.');
                 }
+
+                log.info(auth);
 
                 authData ={
                     'user': f1Username,
@@ -368,7 +374,7 @@ async function run() {
                         })
                         .save(outFile);
                 })
-                .catch(e => log.error('getItemUrl Error:', e));
+                .catch(e => log.error('getItemUrl Error:', e.message));
 
             }
             if (channelList) {

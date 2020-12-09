@@ -6,3 +6,4 @@ download
 .f1tvtoken
 data.json
 test-datastore.js
+datastore.json
