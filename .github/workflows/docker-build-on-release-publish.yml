@@ -93,7 +93,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag-name: ${{ steps.semver.outputs.release_version }}
+        tag_name: ${{ steps.semver.outputs.release_version }}
         release_name: fltv-dl ${{ steps.bump_version.outputs.release_version }}
         draft: false
         prerelease: false
