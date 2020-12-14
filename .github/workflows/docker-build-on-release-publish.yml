@@ -6,7 +6,7 @@ name: Docker Build
 on:  
   release:
     types:
-      - published
+      - released
     branches: 
       - main
       

@@ -1,12 +1,20 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Validate build
 
 on:  
+  push:    
+    paths-ignore:
+      - '.github'
+      - '*.md'
+    branches: [ main ]
   pull_request:
-    branches: 
-      - main
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+    paths-ignore:
+      - '.github'
+      - '*.md'
 
 jobs:
   build:
