@@ -1,9 +1,9 @@
 node_modules
+archive
 *.ts
 *.mp4
 download
 .env*
-.f1tvtoken
-data.json
-test-datastore.js
-datastore.json
+datastore*.json
+test-*.js
+*.png

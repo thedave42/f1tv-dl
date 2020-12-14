@@ -4,7 +4,7 @@ Use to download videos from f1tv website with a valid username/password
 This is the break into modules branch
 
 ```
-index.js <url>
+f1tv-dl <url>
 
 Download a video
 
@@ -27,13 +27,13 @@ Clone the repo and run npm install to install dependencies.
 ```
 git clone https://github.com/thedave42/f1tv-dl.git
 cd f1tv-dl
-npm i
+npm i -g
 ```
 
 ## Download a video 
 
-`node index.js https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race`
+`f1tv-dl https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race`
 
 ## See a list of different video feeds from a race with multiple feeds
 
-`node index.js https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race --channel-list`
+`f1tv-dl https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race --channel-list`
