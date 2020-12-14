@@ -2,9 +2,9 @@
   "name": "f1tv-dl",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "bin/cli.js",
   "bin": {
-    "f1tv-dl": "index.js"
+    "f1tv-dl": "bin/cli.js"
   },
   "scripts": {
     "test": "jest"
@@ -15,9 +15,15 @@
     "axios": "^0.21.0",
     "dotenv": "^8.2.0",
     "fluent-ffmpeg": "git+https://github.com/thedave42/node-fluent-ffmpeg.git",
+    "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
     "minimist": "^1.2.5",
     "mkdirp": "^1.0.4",
+    "node-fetch": "^2.6.1",
+    "puppeteer": "^5.5.0",
+    "puppeteer-extra": "^3.1.15",
+    "puppeteer-extra-plugin-adblocker": "^2.11.9",
+    "puppeteer-extra-plugin-stealth": "^2.6.5",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
