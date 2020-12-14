@@ -9,6 +9,9 @@ on:
       - main
     tags:
       - docker-build
+    paths-ignore:
+      - '.github'
+      - '*.md'
       
 jobs:
   build:
