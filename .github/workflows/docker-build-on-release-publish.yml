@@ -3,15 +3,13 @@
 
 name: Docker Build
 
-on:  
-  push:
-    branches: 
+on:
+  release:
+    branches:
       - main
-    tags:
-      - docker-build
-    paths-ignore:
-      - '.github'
-      - '*.md'
+    types: 
+      - released
+    
       
 jobs:
   build:
