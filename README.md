@@ -5,20 +5,29 @@ Use to download videos from f1tv website with a valid username/password
 ```
 f1tv-dl <url>
 
-Download a video
-
 Positionals:
   url  The f1tv url for the video                                       [string]
 
 Options:
-  --help              Show help                                        [boolean]
-  --version           Show version number                              [boolean]
-  --channel, -c       Choose wif,driver,data,pit lane or specify driver
-                      name/number/tla                  [string] [default: "wif"]
-  --audio-stream, -a  Specify audio stream index to download
+      --help              Show help                                    [boolean]
+      --version           Show version number                          [boolean]
+  -c, --channel           Choose wif,driver,data,pit lane or specify driver
+                          name/number/tla              [string] [default: "wif"]
+  -v, --program-stream    Specify the program for the video stream
                                                          [string] [default: "0"]
-  --channel-list      Provides a list of channels available from url (for videos
-                      with multiple cameras)          [boolean] [default: false]
+  -a, --audio-stream      Specify audio stream index to download
+                                                         [string] [default: "0"]
+  -f, --format            Specify mp4 or TS output (default mp4)
+                                [string] [choices: "mp4", "ts"] [default: "mp4"]
+  -o, --output-directory  Specify a directory for the downloaded file
+                                                        [string] [default: null]
+  -U, --username          F1TV User name                [string] [default: null]
+  -P, --password          F1TV password                 [string] [default: null]
+      --channel-list      Provides a list of channels available from url (for
+                          videos with multiple cameras)
+                                                      [boolean] [default: false]
+  -l, --log-level         set the log level
+          [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
 ```
 
 ## Install
