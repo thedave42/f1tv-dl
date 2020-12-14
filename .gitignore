@@ -4,6 +4,11 @@ archive
 *.mp4
 download
 .env*
+.f1tvtoken
+data.json
+test-*.js
+datastore*.json
+archive
 datastore*.json
 test-*.js
 *.png
