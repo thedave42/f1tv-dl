@@ -75,6 +75,17 @@ jobs:
           ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:latest
           ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ steps.semver.outputs.release_version }}
 
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.semver.outputs.release_version }}
+        release_name: fltv-dl ${{ steps.bump_version.outputs.release_version }}
+        draft: false
+        prerelease: false
+
     - 
       name: Commit changes
       uses: EndBug/add-and-commit@v5
@@ -87,16 +98,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.semver.outputs.release_version }}
-        release_name: fltv-dl ${{ steps.bump_version.outputs.release_version }}
-        draft: false
-        prerelease: false
 
 
 
