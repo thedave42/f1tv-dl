@@ -19,7 +19,6 @@ on:
         required: true
         default: 'version := "%d.%d.%d"'
     
-      
 jobs:
   build:
     
@@ -87,3 +86,17 @@ jobs:
         cwd: ${{ env.PROJECT_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.bump_version.outputs.release_version }}
+        release_name: fltv-dl ${{ steps.bump_version.outputs.release_version }}
+        draft: false
+        prerelease: false
+
+
+
