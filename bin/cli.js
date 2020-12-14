@@ -140,7 +140,7 @@ const getSessionChannelList = (urlStr) => {
             })
             .demandCommand()
             .showHelpOnFail()
-            .parse()
+            .parse();
 
         log.setLevel(logLevel);
 
