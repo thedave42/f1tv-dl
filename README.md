@@ -1,6 +1,8 @@
 # f1tv-dl
 
-Use to download videos from f1tv website with a valid username/password
+Watch videos locally from f1tv website 
+
+Note: a valid username/password is required
 
 ```
 f1tv-dl <url>
