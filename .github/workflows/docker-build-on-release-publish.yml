@@ -82,7 +82,7 @@ jobs:
         author_name: the Dave
         author_email: dave@digitalnoise.net
         message: "Bump release version in VERSION file to ${{ steps.semver.outputs.release_version }}"
-        tag: ${{steps.bump_version.outputs.release_version}}
+        tag: ${{steps.semver.outputs.release_version}}
         cwd: ${{ env.PROJECT_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,7 +93,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.bump_version.outputs.release_version }}
+        tag-name: ${{ steps.semver.outputs.release_version }}
         release_name: fltv-dl ${{ steps.bump_version.outputs.release_version }}
         draft: false
         prerelease: false
