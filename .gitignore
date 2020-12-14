@@ -1,4 +1,5 @@
 node_modules
+archive
 *.ts
 *.mp4
 download
@@ -8,3 +9,6 @@ data.json
 test-*.js
 datastore*.json
 archive
+datastore*.json
+test-*.js
+*.png
