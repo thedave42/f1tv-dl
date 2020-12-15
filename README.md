@@ -33,13 +33,15 @@ Options:
 ```
 
 ## Install
-Clone the repo and run npm install to install dependencies.
+Clone the repo and run npm install to install dependencies. 
+
+(ffmpeg is required and needs to be installed manually)
 ```
 git clone https://github.com/thedave42/f1tv-dl.git
 cd f1tv-dl
 npm i -g
 ```
-or use Docker
+or use Docker (no need to install ffmpeg)
 ```
 docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker -o /download <url> [options] 
 ```
