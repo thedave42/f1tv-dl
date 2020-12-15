@@ -2,7 +2,7 @@ const config = require('./lib/config');
 
 const yargs = require('yargs');
 const log = require('loglevel');
-const ffmpeg = require('fluent-ffmpeg');
+const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const axios = require('axios');
 
 const { isF1tvUrl, isF1tvEpisodeUrl } = require('./lib/f1tv-validator');
