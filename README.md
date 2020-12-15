@@ -48,8 +48,10 @@ docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker 
 
 ## Download a video 
 
-`f1tv-dl https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race`
+Log in to your f1tv account, navigate to the video you want to watch, and copy the url from your browser.
+
+`f1tv-dl <url>`
 
 ## See a list of different video feeds from a race with multiple feeds
 
-`f1tv-dl https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2019-abu-dhabi-grand-prix-race --channel-list`
+`f1tv-dl <url> --channel-list`
