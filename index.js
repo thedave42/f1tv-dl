@@ -1,12 +1,13 @@
-const config = require('../lib/config');
+const config = require('./lib/config');
 
 const yargs = require('yargs');
 const log = require('loglevel');
-const ffmpeg = require('fluent-ffmpeg');
+const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const axios = require('axios');
 
-const { isF1tvUrl, isF1tvEpisodeUrl } = require('../lib/f1tv-validator');
-const { getSessionUrl, getFinalUrl, getEpisodeUrl, saveF1tvToken, getSlugName } = require('../lib/f1tv-api');
+const { isF1tvUrl, isF1tvEpisodeUrl } = require('./lib/f1tv-validator');
+const { getSessionUrl, getFinalUrl, getEpisodeUrl, saveF1tvToken, getSlugName } = require('./lib/f1tv-api');
+const { info } = require('loglevel');
 
 const printSessionChannelList = (channels = []) => {
     let channel = channels.shift();
@@ -156,6 +157,9 @@ const getSessionChannelList = (urlStr) => {
             if (e.response.status >= 400 && e.response.status <= 499) {
                 if (f1Username == null || f1Password == null ) throw new Error('Please provide a valid username and password.');
                 await saveF1tvToken(f1Username, f1Password);
+                log.info('Authorization token encrypted and stored for future use at:');
+                log.info('\t',config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
+                log.info('Username and password were not saved.\n');
                 f1tvUrl = await getFinalUrl(assetId);
             }
         }
