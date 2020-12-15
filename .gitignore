@@ -12,3 +12,4 @@ archive
 datastore*.json
 test-*.js
 *.png
+docker-compose*.yml
