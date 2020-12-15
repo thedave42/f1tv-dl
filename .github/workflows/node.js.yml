@@ -24,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.15.1]
+        node-version: [12.x]
 
     steps:
     - 
@@ -38,7 +38,5 @@ jobs:
 
     -
       run: |
-        ssh-add -l -E sha256
-        ssh -vT git@github.com
         npm ci
         npm test
