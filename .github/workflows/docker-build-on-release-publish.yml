@@ -48,6 +48,11 @@ jobs:
       name: Generic Version Bumpr
       id: semver
       uses: PackagrIO/action-bumpr-generic@v0.0.1
+      with:
+        version_bump_type: ${{ env.INPUTS_VERSION_BUMP_TYPE }}
+        version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
+        generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
+
 
     - 
       run: echo version is ${{ steps.semver.outputs.release_version }}
