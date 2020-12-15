@@ -36,7 +36,7 @@ jobs:
 
     - 
       run: |
-        echo version_bump_type: ${{ inputs.version_bump_type }}
+        echo version_bump_type: ${{ workflow_dispatch.inputs.version_bump_type }}
         echo version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
         echo generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
 
