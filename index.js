@@ -164,7 +164,6 @@ const getSessionChannelList = (urlStr) => {
         }
 
         log.debug('tokenized url:', f1tvUrl);
-        log.debug(ffmpeg.path);
         const ext = (format == "mp4") ? 'mp4' : 'ts';
         const outFile = (isF1tvEpisodeUrl(url)) ? `${getSlugName(url)}.${ext}` : `${getSlugName(url)}-${channel.split(' ').shift()}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
@@ -213,7 +212,7 @@ const getSessionChannelList = (urlStr) => {
             .on('error', e => {
                 log.error('ffmpeg error:', e);
             })
-            .save(outFile);
+            .save(outFileSpec);
     }
     catch (error) {
         log.error('f1tv-dl encountered an error:', error.message);
