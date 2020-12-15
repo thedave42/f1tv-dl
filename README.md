@@ -39,6 +39,10 @@ git clone https://github.com/thedave42/f1tv-dl.git
 cd f1tv-dl
 npm i -g
 ```
+or use Docker
+```
+docker run -v <your local directory>:/download ghcr.io/thedave42 f1tv-dl-docker -o /download <url> [options] 
+```
 
 ## Download a video 
 
