@@ -46,19 +46,18 @@ jobs:
 
     - 
       run: |
-        echo version_bump_type: ${{ env.INPUTS_VERSION_BUMP_TYPE }}
-        echo version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
-        echo generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
+        echo version_bump_type: ${{ github.event.inputs.version_bump_type }}
+        echo version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
+        echo generic_version_template: ${{ github.event.inputs.generic_version_template }}}
 
     - 
       name: Generic Version Bumpr
       id: semver
       uses: PackagrIO/action-bumpr-generic@v0.0.1
       with:
-        version_bump_type: ${{ env.INPUTS_VERSION_BUMP_TYPE }}
-        version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
-        generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
-
+        version_bump_type: ${{ github.event.inputs.version_bump_type }}
+        version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
+        generic_version_template: ${{ github.event.inputs.generic_version_template }}
 
     - 
       run: echo version is ${{ steps.semver.outputs.release_version }}
