@@ -2,7 +2,7 @@
 
 Watch videos locally from f1tv website 
 
-Note: a valid username/password is required
+Note: a valid username/password is required.  The app will use your username and password to save your session so the they will only be required again when your session has expried.
 
 ```
 f1tv-dl <url>
