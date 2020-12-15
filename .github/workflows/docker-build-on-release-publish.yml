@@ -5,6 +5,8 @@ name: Docker Build and Source Release
 
 on:
  workflow_dispatch:
+    branches:
+      - main
     inputs:
       version_bump_type:
         description: 'Version Bump Type (major, minor, patch)'
