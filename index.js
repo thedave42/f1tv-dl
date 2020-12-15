@@ -7,7 +7,6 @@ const axios = require('axios');
 
 const { isF1tvUrl, isF1tvEpisodeUrl } = require('./lib/f1tv-validator');
 const { getSessionUrl, getFinalUrl, getEpisodeUrl, saveF1tvToken, getSlugName } = require('./lib/f1tv-api');
-const { info } = require('loglevel');
 
 const printSessionChannelList = (channels = []) => {
     let channel = channels.shift();
