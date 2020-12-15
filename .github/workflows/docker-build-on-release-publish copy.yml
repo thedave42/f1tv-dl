@@ -40,9 +40,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    -
+    - # Project must build and run before it's released
       run: |
         npm ci
+        npm test
 
     - 
       run: |
