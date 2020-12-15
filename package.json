@@ -2,14 +2,14 @@
   "name": "f1tv-dl",
   "version": "1.0.0",
   "description": "",
-  "main": "bin/cli.js",
+  "main": "index.js",
   "bin": {
-    "f1tv-dl": "bin/cli.js"
+    "f1tv-dl": "index.js"
   },
   "scripts": {
     "test": "jest"
   },
-  "author": "",
+  "author": "dave@digitalnoise.net",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.0",
@@ -39,5 +39,7 @@
     "type": "git",
     "url": "git+https://github.com/thedave42/f1tv-dl.git"
   },
-  "homepage": "https://github.com/thedave42/f1tv-dl#readme"
+  "config": {
+    "puppeteer_download_path": "./node_modules/puppeteer/.local-chromium"
+  }
 }
