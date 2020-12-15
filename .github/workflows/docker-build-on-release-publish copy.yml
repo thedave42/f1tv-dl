@@ -45,6 +45,12 @@ jobs:
         npm ci
 
     - 
+      run: |
+        echo version_bump_type: ${{ env.INPUTS_VERSION_BUMP_TYPE }}
+        echo version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
+        echo generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
+
+    - 
       name: Generic Version Bumpr
       id: semver
       uses: PackagrIO/action-bumpr-generic@v0.0.1

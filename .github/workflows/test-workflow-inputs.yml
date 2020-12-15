@@ -1,0 +1,53 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Docker Build and Source Release
+
+on:
+ workflow_dispatch:
+    branches:
+      - main
+    inputs:
+      version_bump_type:
+        description: 'Version Bump Type (major, minor, patch)'
+        required: true
+        default: 'minor'
+      version_metadata_path:
+        description: 'Path to file containing Version string'
+        required: true
+        default: 'VERSION'
+      generic_version_template:
+        description: 'Go Template used for updating metadata file'
+        required: true
+        default: 'version := "%d.%d.%d"'
+    
+jobs:
+  build:
+    
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['14']
+
+    steps:
+    - 
+      uses: actions/checkout@v2
+
+    - 
+      run: |
+        echo version_bump_type: ${{ env.INPUTS_VERSION_BUMP_TYPE }}
+        echo version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
+        echo generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
+
+    - 
+      name: Generic Version Bumpr
+      id: semver
+      uses: PackagrIO/action-bumpr-generic@v0.0.1
+      with:
+        version_bump_type: ${{ env.INPUTS_VERSION_BUMP_TYPE }}
+        version_metadata_path: ${{ env.INPUTS_VERSION_METADATA_PATH }}
+        generic_version_template: ${{ env.INPUTS_GENERIC_VERSION_TEMPLATE }}
+
+    - 
+      run: echo version is ${{ steps.semver.outputs.release_version }}
