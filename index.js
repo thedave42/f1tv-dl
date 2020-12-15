@@ -210,12 +210,14 @@ const getSessionChannelList = (urlStr) => {
                 log.info('\nDownload complete.');
             })
             .on('error', e => {
-                log.error('ffmpeg error:', e);
+                log.error('ffmpeg error:', e.message);
+                log.debug(e);
             })
             .save(outFileSpec);
     }
     catch (error) {
         log.error('Error:', error.message);
+        log.debug(e);
     }
 })();
 
