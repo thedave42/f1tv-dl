@@ -26,7 +26,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [15.x]
+        node-version: ['12']
 
     steps:
     - 
@@ -93,7 +93,6 @@ jobs:
         author_name: the Dave
         author_email: dave@digitalnoise.net
         message: "Bump release version in VERSION file to ${{ steps.semver.outputs.release_version }}"
-        tag: ${{steps.semver.outputs.release_version}}
         cwd: ${{ env.PROJECT_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
