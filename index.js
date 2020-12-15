@@ -147,6 +147,7 @@ const getSessionChannelList = (urlStr) => {
         if (channelList) return getSessionChannelList(url);
 
         const assetId = (isF1tvEpisodeUrl(url)) ? await getEpisodeUrl(url) : await getSessionUrl(url, channel);
+        (isF1tvEpisodeUrl(url))?log.info(`Found episode id for ${config.makeItGreen(getSlugName(url))}.`):log.info(`Found session id for ${config.makeItGreen(getSlugName(url))} channel ${config.makeItGreen(channel)}`);
 
         let f1tvUrl;
         try {
@@ -155,10 +156,9 @@ const getSessionChannelList = (urlStr) => {
         catch (e) {
             if (e.response.status >= 400 && e.response.status <= 499) {
                 if (f1Username == null || f1Password == null ) throw new Error('Please provide a valid username and password.');
+                log.info('Login required.  This may take 10-30 seconds.');
                 await saveF1tvToken(f1Username, f1Password);
-                log.info('Authorization token encrypted and stored for future use at:');
-                log.info('\t',config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
-                log.info('Username and password were not saved.\n');
+                log.info('Authorization token encrypted and stored for future use at:', config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
                 f1tvUrl = await getFinalUrl(assetId);
             }
         }
@@ -195,15 +195,15 @@ const getSessionChannelList = (urlStr) => {
             .input(f1tvUrl)
             .outputOptions(options)
             .on('start', commandLine => {
-                log.info('Executing command:', config.makeItGreen(commandLine));
+                log.debug('Executing command:', config.makeItGreen(commandLine));
             })
             .on('codecData', data => {
                 log.debug(data.video);
-                log.debug(data.audio)
-                log.info('File duration:', config.makeItGreen(data.duration));
+                log.debug(data.audio);
+                log.info('File duration:', config.makeItGreen(data.duration),'\n');
             })
             .on('progress', info => {
-                let outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration= ' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
                 process.stdout.write(outStr);
             })
             .on('end', () => {
@@ -215,7 +215,7 @@ const getSessionChannelList = (urlStr) => {
             .save(outFileSpec);
     }
     catch (error) {
-        log.error('f1tv-dl encountered an error:', error.message);
+        log.error('Error:', error.message);
     }
 })();
 
