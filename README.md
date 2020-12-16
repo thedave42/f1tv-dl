@@ -32,7 +32,7 @@ Options:
           [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
 ```
 
-## Install
+## Use
 Clone the repo and run npm install to install dependencies. 
 
 (ffmpeg is required and needs to be installed manually)
