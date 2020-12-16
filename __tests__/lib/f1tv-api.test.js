@@ -1,12 +1,13 @@
+const config = require('../../lib/config');
 const { getSlugName, getEpisodeUrl, getSessionUrl } = require('../../lib/f1tv-api');
 
-const raceUrl = 'https://f1tv.formula1.com/en/current-season/abu-dhabi-grand-prix/2020-abu-dhabi-grand-prix-formula-1-race';
-const episodeUrl = 'https://f1tv.formula1.com/en/episode/watch-along-e03-2008-brazilian-gp-the-championship-showdown';
-const raceSlug = '2020-abu-dhabi-grand-prix-formula-1-race';
-const episodeSlug = 'watch-along-e03-2008-brazilian-gp-the-championship-showdown';
-const validEpisodeUrl = '/api/assets/asse_8a0abdba63614b1b9f2115165c746c80/';
-const validRaceSessionUrl = '/api/channels/chan_30bbe36c6a0b4c299fc2dab177ac7e7b/';
-const validHAMSessionUrl = '/api/channels/chan_d4b5c3cf47d74258b1049994786028a9/';
+const raceUrl = process.env.RACEURL;
+const episodeUrl = process.env.EPISODEURL;
+const raceSlug = process.env.RACESLUG;
+const episodeSlug = process.env.EPISODESLUG;
+const validEpisodeUrl = process.env.VALIDEPISODEURL;
+const validRaceSessionUrl = process.env.VALIDRACESESSIONURL;
+const validHAMSessionUrl = process.env.VALIDHAMSESSIONURL;
 
 test('Test for valid race url slug', () => {
     expect(getSlugName(raceUrl)).toBe(raceSlug);
