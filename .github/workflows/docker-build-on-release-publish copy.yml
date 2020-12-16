@@ -44,7 +44,14 @@ jobs:
       run: |
         npm ci
         npm test
-
+      env:
+        RACEURL: ${{ secrets.RACEURL }}
+        EPISODEURL: ${{ secrets.EPISODEURL }}
+        RACESLUG: ${{ secrets.RACESLUG }}
+        EPISODESLUG: ${{ secrets.EPISODESLUG }}
+        VALIDEPISODEURL: ${{ secrets.VALIDEPISODEURL }}
+        VALIDRACESESSIONURL: ${{ secrets.VALIDRACESESSIONURL }}
+        VALIDHAMSESSIONURL: ${{ secrets.VALIDHAMSESSIONURL }}
     - 
       run: |
         echo version_bump_type: ${{ github.event.inputs.version_bump_type }}
