@@ -47,6 +47,16 @@ test('Add a value to the datastore and make sure it\'s encrypted', () => {
 
 test('Get a value from the datastore and make sure it\'s decrypted', async () => {
     const ds = new DataStore(testFile);
+    let ok = false;
+    try {
+        fs.accessSync(testFile, fs.constants.R_OK | fs.constants.W_OK);
+        ok = true;
+    }
+    catch (e) {
+        ok = false;
+    }
+    expect(ok).toBeTruthy();    
+    
     const value = await ds.get(testKey);
     expect(value).toBe(testValue);
 });
