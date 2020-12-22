@@ -51,3 +51,4 @@ jobs:
         VALIDHAMSESSIONURL: ${{ secrets.VALIDHAMSESSIONURL }}
         F1TV_USER: ${{ secrets.F1TV_USER }}
         F1TV_PASS: ${{ secrets.F1TV_PASS }}
+        DS_CRYPT_KEY_SEED: ${{ secrets.DS_CRYPT_KEY_SEED }} 
