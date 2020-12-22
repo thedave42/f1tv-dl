@@ -10,6 +10,6 @@ WORKDIR /f1tv
 COPY . /f1tv
 
 RUN npm i puppeteer
-RUN npm i
+RUN npm i --production
 
 ENTRYPOINT [ "/bin/sh", "run.sh" ]
