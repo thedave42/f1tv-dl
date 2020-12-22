@@ -1,0 +1,7 @@
+**/node_modules/
+**/.git
+**/README.md
+**/.vscode
+**/npm-debug.log
+**/.env**
+**/.eslintrc.json
