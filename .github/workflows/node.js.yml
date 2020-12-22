@@ -40,6 +40,7 @@ jobs:
       run: |
         npm ci
         npm test
+      timeout-minutes: 5
       env:
         RACEURL: ${{ secrets.RACEURL }}
         EPISODEURL: ${{ secrets.EPISODEURL }}
