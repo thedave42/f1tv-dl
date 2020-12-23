@@ -60,5 +60,5 @@ jobs:
        with:
          name: f1tv-build-artifacts
          path: |
-          !./node_modules/**
+          !node_modules/**
           ./
