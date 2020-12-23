@@ -59,4 +59,6 @@ jobs:
        if: failure()
        with:
          name: f1tv-build-artifacts
-         path: ./
+         path: |
+          !./node_modules/**
+          ./
