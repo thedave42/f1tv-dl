@@ -215,12 +215,8 @@ const getSessionChannelList = (urlStr) => {
             })
             .save(outFileSpec);
     }
-    catch (error) {
-        log.error('Error:', error.message);
-        log.debug(error);
+    catch (e) {
+        log.error('Error:', e.message);
+        log.debug(e);
     }
 })();
-
-
-
-
