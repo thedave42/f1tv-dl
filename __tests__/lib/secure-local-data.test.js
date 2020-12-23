@@ -1,4 +1,3 @@
-require('trace-unhandled/register');
 const DataStore = require('../../lib/secure-local-data');
 const fs = require('fs');
 const { encrypt, decrypt } = require('../../lib/secure');
