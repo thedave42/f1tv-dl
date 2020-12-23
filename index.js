@@ -217,7 +217,7 @@ const getSessionChannelList = (urlStr) => {
     }
     catch (error) {
         log.error('Error:', error.message);
-        log.debug(e);
+        log.debug(error);
     }
 })();
 
