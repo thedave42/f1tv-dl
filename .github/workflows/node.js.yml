@@ -39,7 +39,7 @@ jobs:
     -
       run: |
         npm ci
-        npm test --maxWorkers=2
+        npm test
       timeout-minutes: 5
       env:
         RACEURL: ${{ secrets.RACEURL }}
