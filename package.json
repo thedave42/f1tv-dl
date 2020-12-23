@@ -7,7 +7,7 @@
     "f1tv-dl": "index.js"
   },
   "scripts": {
-    "test": "jest --detectOpenHandles --maxWorkers=2"
+    "test": "jest --detectOpenHandles"
   },
   "author": "dave@digitalnoise.net",
   "license": "ISC",
