@@ -1,3 +1,4 @@
+require('trace-unhandled/register');
 const DataStore = require('../../lib/secure-local-data');
 const fs = require('fs');
 const { encrypt, decrypt } = require('../../lib/secure');
@@ -39,14 +40,16 @@ test('Datastore file is writeable', () => {
 
 test('Add a value to the datastore and make sure it\'s encrypted', () => {
     const ds = new DataStore(testFile);
-    ds.add(testKey, testValue)    
+    const record = ds.add(testKey, testValue);
+    expect(record[testKey]).toBe(encrypt(testValue));
+    /*ds.add(testKey, testValue)    
         .then( record => {
             expect(record[testKey]).toBe(encrypt(testValue)); 
-        })
+        })*/
 });
 
 test('Get a value from the datastore and make sure it\'s decrypted', () => {
-    const ds = new DataStore(testFile); 
+    const ds = new DataStore(testFile);
     let ok = false;
     try {
         fs.accessSync(testFile, fs.constants.R_OK | fs.constants.W_OK);
@@ -55,10 +58,8 @@ test('Get a value from the datastore and make sure it\'s decrypted', () => {
     catch (e) {
         ok = false;
     }
-    expect(ok).toBeTruthy();    
-    
-    ds.get(testKey)
-        .then( value => {
-            expect(value).toBe(testValue);
-        });
+    expect(ok).toBeTruthy();
+
+    const value = ds.get(testKey);
+    expect(value).toBe(testValue);
 });
