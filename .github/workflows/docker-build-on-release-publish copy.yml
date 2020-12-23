@@ -114,6 +114,7 @@ jobs:
         author_email: dave@digitalnoise.net
         message: "Bump release version in VERSION file to ${{ steps.semver.outputs.release_version }}"
         cwd: ${{ env.PROJECT_PATH }}
+        push: --force
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
