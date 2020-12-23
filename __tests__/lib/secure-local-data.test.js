@@ -3,7 +3,7 @@ const fs = require('fs');
 const { encrypt, decrypt } = require('../../lib/secure');
 
 const testValue = 'This is a test string 12390389450145f @#$%!#$!@^%!#$ja:"{#@$(%!F>';
-const testKey = 'key';
+const testKey = 'token';
 const testFile = './datastore-test.json';
 
 test('Datastore file is successfully created', () => {
