@@ -61,4 +61,4 @@ jobs:
          name: f1tv-build-artifacts
          path: |
           !node_modules/**
-          datastore-test.json
+          ./datastore-test.json
