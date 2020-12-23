@@ -52,3 +52,11 @@ jobs:
         F1TV_USER: ${{ secrets.F1TV_USER }}
         F1TV_PASS: ${{ secrets.F1TV_PASS }}
         DS_CRYPT_KEY_SEED: ${{ secrets.DS_CRYPT_KEY_SEED }}
+    
+    -
+       name: Upload artifacts on failure
+       uses: actions/upload-artifact@v2
+       if: failure()
+       with:
+         name: f1tv-build-artifacts
+         path: ./
