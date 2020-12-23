@@ -45,7 +45,7 @@ or use Docker (no need to install ffmpeg)
 ```
 docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker:latest -o /download <url> [options] 
 ```
-
+Username and password can also be read from the environment variables `F1TV_USER` and `F1TV_PASS`.  
 ## Download a video 
 
 Log in to your f1tv account, navigate to the video you want to watch, and copy the url from your browser.
