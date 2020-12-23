@@ -43,7 +43,7 @@ npm i -g
 ```
 or use Docker (no need to install ffmpeg)
 ```
-docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker -o /download <url> [options] 
+docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker:latest -o /download <url> [options] 
 ```
 
 ## Download a video 
