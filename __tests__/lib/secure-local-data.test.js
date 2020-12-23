@@ -46,7 +46,7 @@ test('Add a value to the datastore and make sure it\'s encrypted', () => {
 });
 
 test('Get a value from the datastore and make sure it\'s decrypted', async () => {
-    const ds = new DataStore(testFile);
+    const ds = new DataStore(testFile);  //comment
     let ok = false;
     try {
         fs.accessSync(testFile, fs.constants.R_OK | fs.constants.W_OK);
