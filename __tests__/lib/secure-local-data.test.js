@@ -45,7 +45,7 @@ test('Add a value to the datastore and make sure it\'s encrypted', () => {
         })
 });
 
-test('Get a value from the datastore and make sure it\'s decrypted', async () => {
+test('Get a value from the datastore and make sure it\'s decrypted', () => {
     const ds = new DataStore(testFile); 
     let ok = false;
     try {
@@ -57,6 +57,8 @@ test('Get a value from the datastore and make sure it\'s decrypted', async () =>
     }
     expect(ok).toBeTruthy();    
     
-    const value = await ds.get(testKey);
-    expect(value).toBe(testValue);
+    ds.get(testKey)
+        .then( value => {
+            expect(value).toBe(testValue);
+        });
 });
