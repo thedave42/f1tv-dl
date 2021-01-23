@@ -18,7 +18,7 @@
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
     "puppeteer": "^5.5.0",
-    "puppeteer-extra": "^3.1.15",
+    "puppeteer-extra": "^3.1.16",
     "puppeteer-extra-plugin-adblocker": "^2.11.9",
     "puppeteer-extra-plugin-stealth": "^2.6.5",
     "yargs": "^16.2.0"
