@@ -8,7 +8,4 @@ jobs:
     name: Genereate a list of dependencies for this repository
     steps:
     - name: Generate dependencies action
-      uses: thedave42/generate-dependencies-csv-action@v0.0.2
-      id: deps    # Use the output from the `hello` step
-    - name: Get the output time
-      run: echo "The time was ${{ steps.deps.outputs.repo }}"
+      uses: thedave42/generate-dependencies-csv-action@v1.0
