@@ -1,39 +1,48 @@
 const config = require('../../lib/config');
-const { getSlugName, getEpisodeUrl, getSessionUrl } = require('../../lib/f1tv-api');
+const { getContentParams, getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo } = require('../../lib/f1tv-api');
 
 const raceUrl = process.env.RACEURL;
 const episodeUrl = process.env.EPISODEURL;
-const raceSlug = process.env.RACESLUG;
-const episodeSlug = process.env.EPISODESLUG;
-const validEpisodeUrl = process.env.VALIDEPISODEURL;
-const validRaceSessionUrl = process.env.VALIDRACESESSIONURL;
-const validHAMSessionUrl = process.env.VALIDHAMSESSIONURL;
+const raceName = process.env.RACENAME;
+const raceId = process.env.RACEID;
+const episodeName = process.env.EPISODENAME;
+const episodeId = process.env.EPISODEID;
+const raceChannelIdData = process.env.RACECHANNELID_DATA;
+const raceChannelIdHam = process.env.RACECHANNELID_HAM;
 
-test('Test for valid race url slug', () => {
-    expect(getSlugName(raceUrl)).toBe(raceSlug);
+test('Check for valid race name', () => {
+    const params = getContentParams(raceUrl);
+    expect(params.name).toBe(raceName);
 });
 
-test('Test for valid episode url slug', () => {
-    expect(getSlugName(episodeUrl)).toBe(episodeSlug);
+test('Check for valid race id', () => {
+    const params = getContentParams(raceUrl);
+    expect(params.id).toBe(raceId);
 });
 
-test('Test for valid episode URL', () => {
-    return getEpisodeUrl(episodeUrl)
-        .then( (url) => {
-            expect(url).toBe(validEpisodeUrl);      
-        });
+test('Check for valid episode name', () => {
+    const params = getContentParams(episodeUrl);
+    expect(params.name).toBe(episodeName);
 });
 
-test('Test for valid race sessionURL', () => {
-    return getSessionUrl(raceUrl)
-        .then( (url) => {
-            expect(url).toBe(validRaceSessionUrl);      
-        });
+test('Check for valid episode id', () => {
+    const params = getContentParams(episodeUrl);
+    expect(params.id).toBe(episodeId);
 });
 
-test('Test for single driver (HAM) cockpit view sessionURL', () => {
-    return getSessionUrl(raceUrl, 'HAM')
-        .then( (url) => {
-            expect(url).toBe(validHAMSessionUrl);      
-        });
+test('Validate altername race data stream', async () => {
+    const content = await getContentInfo(raceUrl);
+    const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'data');
+    const contentParams = getContentParams(raceUrl);
+    const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+    expect(channelId).toBe(raceChannelIdData);
 });
+
+test('Validate altername driver data stream', async () => {
+    const content = await getContentInfo(raceUrl);
+    const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'ham');
+    const contentParams = getContentParams(raceUrl);
+    const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+    expect(channelId).toBe(raceChannelIdHam);
+});
+
