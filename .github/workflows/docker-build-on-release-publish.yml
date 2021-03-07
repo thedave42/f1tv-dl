@@ -48,13 +48,14 @@ jobs:
       env:
         RACEURL: ${{ secrets.RACEURL }}
         EPISODEURL: ${{ secrets.EPISODEURL }}
-        RACESLUG: ${{ secrets.RACESLUG }}
-        EPISODESLUG: ${{ secrets.EPISODESLUG }}
-        VALIDEPISODEURL: ${{ secrets.VALIDEPISODEURL }}
-        VALIDRACESESSIONURL: ${{ secrets.VALIDRACESESSIONURL }}
-        VALIDHAMSESSIONURL: ${{ secrets.VALIDHAMSESSIONURL }}
         F1TV_USER: ${{ secrets.F1TV_USER }}
         F1TV_PASS: ${{ secrets.F1TV_PASS }}
+        RACENAME: ${{ secrets.RACENAME }}
+        RACEID: ${{ secrets.RACEID }}
+        EPISODENAME: ${{ secrets.EPISODENAME }}
+        EPISODEID: ${{ secrets.EPISODEID }}
+        RACECHANNELID_DATA: ${{ secrets.RACECHANNELID_DATA }}
+        RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
     - 
       run: |
         echo version_bump_type: ${{ github.event.inputs.version_bump_type }}
