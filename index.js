@@ -5,8 +5,9 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const axios = require('axios');
 
-const { isF1tvUrl, isF1tvEpisodeUrl } = require('./lib/f1tv-validator');
-const { getContentInfo, getContentStreamUrl } = require('./lib/f1tv-api');
+const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
+const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams } = require('./lib/f1tv-api');
+const { exit } = require('yargs');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
@@ -51,8 +52,8 @@ const getSessionChannelList = (url) => {
                     })
                     .option('channel', {
                         type: 'string',
-                        desc: 'Choose wif,driver,data,pit lane or specify driver name/number/tla',
-                        default: 'wif',
+                        desc: 'Choose an alternate channel for a race or race replay. Use the channel-list option to see a list of channels and specify name/number/tla to stream alternate channel.',
+                        default: null,
                         alias: 'c'
                     })
                     .option('program-stream', {
@@ -120,26 +121,23 @@ const getSessionChannelList = (url) => {
 
         if (channelList) return getSessionChannelList(url);
 
-        const assetId = (isF1tvEpisodeUrl(url)) ? await getEpisodeUrl(url) : await getSessionUrl(url, channel);
-        (isF1tvEpisodeUrl(url))?log.info(`Found episode id for ${config.makeItGreen(getSlugName(url))}.`):log.info(`Found session id for ${config.makeItGreen(getSlugName(url))} channel ${config.makeItGreen(channel)}`);
-
+        const content = await getContentInfo(url);
+        
         let f1tvUrl;
-        try {
-            f1tvUrl = await getFinalUrl(assetId);
+        if (isRace(content) && channel !== null) {
+            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
+            const contentParams = getContentParams(url);
+            const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+            f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
         }
-        catch (e) {
-            if (e.response.status >= 400 && e.response.status <= 499) {
-                if (f1Username == null || f1Password == null ) throw new Error('Please provide a valid username and password.');
-                log.info('Login required.  This may take 10-30 seconds.');
-                await saveF1tvToken(f1Username, f1Password);
-                log.info('Authorization token encrypted and stored for future use at:', config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
-                f1tvUrl = await getFinalUrl(assetId);
-            }
+        else {
+            const contentParams = getContentParams(url);
+            f1tvUrl = await getContentStreamUrl(contentParams.id);
         }
 
         log.debug('tokenized url:', f1tvUrl);
         const ext = (format == "mp4") ? 'mp4' : 'ts';
-        const outFile = (isF1tvEpisodeUrl(url)) ? `${getSlugName(url)}.${ext}` : `${getSlugName(url)}-${channel.split(' ').shift()}.${ext}`;
+        const outFile = (isRace(content) && channel !== null) ?`${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}`:`${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
         log.info('Output file:', config.makeItGreen(outFileSpec));
