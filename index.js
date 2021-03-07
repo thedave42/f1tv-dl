@@ -6,47 +6,21 @@ const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const axios = require('axios');
 
 const { isF1tvUrl, isF1tvEpisodeUrl } = require('./lib/f1tv-validator');
-const { getSessionUrl, getFinalUrl, getEpisodeUrl, saveF1tvToken, getSlugName } = require('./lib/f1tv-api');
+const { getContentInfo, getContentStreamUrl } = require('./lib/f1tv-api');
 
-const printSessionChannelList = (channels = []) => {
-    let channel = channels.shift();
-    //if (channels.length < 1) { return }
-    return axios.get(channel, {
-        baseURL: config.BASE_URL,
-        params: {
-            'fields_to_expand': 'driveroccurrence_urls'
-        }
-    })
-    .then((response) => {
-        let data = (response.data.channel_type === 'driver')?`name: ${config.makeItGreen(response.data.name)}`.padEnd(37) + `number: ${config.makeItGreen(response.data.driveroccurrence_urls[0].driver_racingnumber)}`.padEnd(22) + `tla: ${config.makeItGreen(response.data.driveroccurrence_urls[0].driver_tla)}`:`name: ${config.makeItGreen(response.data.name)}`;
-        log.info(data);
-        return (channels.length > 0)?printSessionChannelList(channels):'';
-    })
-}
-
-const getSessionChannelList = (urlStr) => {
-    let slug = getSlugName(urlStr);
-    if (isF1tvEpisodeUrl(urlStr)) throw new Error('Video does not have multiple cameras available.');
-    log.debug(`getSessionChannelList Slug is ${slug}`);
-    return axios.get('/api/session-occurrence/', {
-        baseURL: config.BASE_URL,
-        params: {
-            'fields': 'availability_details,status,uid',
-            'slug': slug
-        }
-    })
-    .then(response => {
-        return axios.get(`/api/session-occurrence/${response.data.objects.shift().uid}/`, {
-            baseURL: config.BASE_URL,
-            params: {
-                'fields': 'channel_urls'
+const getSessionChannelList = (url) => {
+    getContentInfo(url)
+    .then( result => {
+        if (result.metadata.additionalStreams !== undefined) {
+            for ( const stream of result.metadata.additionalStreams ) {
+                const data = (stream.type === 'obc')?`name: ${config.makeItGreen(stream.driverFirstName+' '+stream.driverLastName)}`.padEnd(37) + `number: ${config.makeItGreen(stream.racingNumber)}`.padEnd(22) + `tla: ${config.makeItGreen(stream.title)}`:`name: ${config.makeItGreen(stream.title)}`;
+                log.info(data);
             }
-        })
-    })
-    .then(response => {
-        log.debug(response.data);
-        return printSessionChannelList(response.data.channel_urls);
-    })
+        }
+        else {
+            log.info('This url does not have additonal streams.');
+        }
+    });
 }
 
 (async () => {
