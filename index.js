@@ -5,7 +5,7 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
-const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams } = require('./lib/f1tv-api');
+const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken } = require('./lib/f1tv-api');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
@@ -20,6 +20,21 @@ const getSessionChannelList = (url) => {
             log.info('This url does not have additonal streams.');
         }
     });
+};
+
+const getTokenizedUrl = async (url, content, channel) => {
+    let f1tvUrl;
+    if (isRace(content) && channel !== null) {
+        const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
+        const contentParams = getContentParams(url);
+        const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+        f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
+    }
+    else {
+        const contentParams = getContentParams(url);
+        f1tvUrl = await getContentStreamUrl(contentParams.id);
+    }
+    return f1tvUrl;
 };
 
 (async () => {
@@ -121,16 +136,20 @@ const getSessionChannelList = (url) => {
 
         const content = await getContentInfo(url);
         
-        let f1tvUrl;
-        if (isRace(content) && channel !== null) {
-            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
-            const contentParams = getContentParams(url);
-            const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
-            f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
+        try {
+            f1tvUrl = await getTokenizedUrl(url, content, channel);
         }
-        else {
-            const contentParams = getContentParams(url);
-            f1tvUrl = await getContentStreamUrl(contentParams.id);
+        catch (e) {
+            if (e.response.status >= 400 && e.response.status <= 499) {
+                if (f1Username == null || f1Password == null ) throw new Error('Please provide a valid username and password.');
+                log.info('Login required.  This may take 10-30 seconds.');
+                await saveF1tvToken(f1Username, f1Password);
+                log.info('Authorization token encrypted and stored for future use at:', config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
+                f1tvUrl = await getTokenizedUrl(url, content, channel);
+            }
+            else {
+                throw e;
+            }            
         }
 
         log.debug('tokenized url:', f1tvUrl);
