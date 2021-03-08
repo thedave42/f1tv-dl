@@ -11,7 +11,7 @@ on:
       version_bump_type:
         description: 'Version Bump Type (major, minor, patch)'
         required: true
-        default: 'minor'
+        default: 'patch'
       version_metadata_path:
         description: 'Path to file containing Version string'
         required: true
