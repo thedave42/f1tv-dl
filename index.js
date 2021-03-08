@@ -3,7 +3,6 @@ const config = require('./lib/config');
 const yargs = require('yargs');
 const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
-const axios = require('axios');
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams } = require('./lib/f1tv-api');

@@ -33,7 +33,6 @@ test('Check for valid episode id', () => {
 test('Validate altername race data stream', async () => {
     const content = await getContentInfo(raceUrl);
     const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'data');
-    const contentParams = getContentParams(raceUrl);
     const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
     expect(channelId).toBe(raceChannelIdData);
 });
@@ -41,7 +40,6 @@ test('Validate altername race data stream', async () => {
 test('Validate altername driver data stream', async () => {
     const content = await getContentInfo(raceUrl);
     const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'ham');
-    const contentParams = getContentParams(raceUrl);
     const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
     expect(channelId).toBe(raceChannelIdHam);
 });
