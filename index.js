@@ -6,7 +6,6 @@ const ffmpeg = require('@thedave42/fluent-ffmpeg');
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams } = require('./lib/f1tv-api');
-const { exit } = require('yargs');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
