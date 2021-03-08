@@ -21,7 +21,7 @@ const getSessionChannelList = (url) => {
             log.info('This url does not have additonal streams.');
         }
     });
-}
+};
 
 (async () => {
     try {
