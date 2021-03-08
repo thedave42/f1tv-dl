@@ -1,5 +1,5 @@
 const config = require('../../lib/config');
-const { getContentParams, getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo } = require('../../lib/f1tv-api');
+const { getContentParams, getContentInfo, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo } = require('../../lib/f1tv-api');
 
 const raceUrl = process.env.RACEURL;
 const episodeUrl = process.env.EPISODEURL;
