@@ -16,11 +16,10 @@ on:
       - '.github/**'
       - '**.md'
   schedule:
-    - cron: '0 0 * * 3'
+    - cron: '6 11 * * 3'
 
 jobs:
-  build:
-    
+  build-for-ubuntu:    
     
     runs-on: ubuntu-latest
 
@@ -40,7 +39,7 @@ jobs:
 
     -
       run: |
-        npm ci
+        npm i
         npm test
       timeout-minutes: 5
       env:
