@@ -11,7 +11,7 @@ const { exit } = require('yargs');
 const getSessionChannelList = (url) => {
     getContentInfo(url)
     .then( result => {
-        if (result.metadata.additionalStreams !== undefined) {
+        if (isRace(result)) {
             for ( const stream of result.metadata.additionalStreams ) {
                 const data = (stream.type === 'obc')?`name: ${config.makeItGreen(stream.driverFirstName+' '+stream.driverLastName)}`.padEnd(37) + `number: ${config.makeItGreen(stream.racingNumber)}`.padEnd(22) + `tla: ${config.makeItGreen(stream.title)}`:`name: ${config.makeItGreen(stream.title)}`;
                 log.info(data);
