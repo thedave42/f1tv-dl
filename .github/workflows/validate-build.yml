@@ -19,9 +19,9 @@ on:
     - cron: '6 11 * * 3'
 
 jobs:
-  build-for-ubuntu:    
+  build-for-macos:    
     
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     strategy:
       matrix:
