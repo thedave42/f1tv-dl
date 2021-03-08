@@ -10,7 +10,7 @@ jobs:
     - name: Generate dependencies action
       uses: thedave42/generate-dependencies-csv-action@v2
       with:
-        repo-token: ${{ secrets.DEPS_TOKEN }}
+        repo-token: ${{ secrets.CR_PAT }}
         repo-names: generate-dependencies-csv-action,f1tv-dl,node-fluent-ffmpeg,node-appletv-x
 
        
