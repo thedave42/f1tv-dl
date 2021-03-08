@@ -42,7 +42,7 @@ jobs:
 
     - # Project must build and run before it's released
       run: |
-        npm ci
+        npm i
         npm test
       timeout-minutes: 5
       env:
