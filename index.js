@@ -72,13 +72,13 @@ const getTokenizedUrl = async (url, content, channel) => {
                     .option('program-stream', {
                         type: 'string',
                         desc: 'Specify the program for the video stream',
-                        default: '0',
+                        default: '5',
                         alias: 'v'
                     })
                     .option('audio-stream', {
                         type: 'string',
                         desc: 'Specify audio stream index to download',
-                        default: '0',
+                        default: 'a',
                         alias: 'a'
                     })
                     .option('format', {
