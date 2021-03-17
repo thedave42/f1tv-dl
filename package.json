@@ -20,7 +20,7 @@
     "puppeteer": "^8.0.0",
     "puppeteer-extra": "^3.1.17",
     "puppeteer-extra-plugin-adblocker": "^2.11.10",
-    "puppeteer-extra-plugin-stealth": "^2.7.5",
+    "puppeteer-extra-plugin-stealth": "^2.7.6",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
