@@ -136,10 +136,12 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         const content = await getContentInfo(url);
         
+        let f1tvUrl = '';
         try {
             f1tvUrl = await getTokenizedUrl(url, content, channel);
         }
         catch (e) {
+            log.debug(e);
             if (e.response.status >= 400 && e.response.status <= 499) {
                 if (f1Username == null || f1Password == null ) throw new Error('Please provide a valid username and password.');
                 log.info('Login required.  This may take 10-30 seconds.');
@@ -160,23 +162,17 @@ const getTokenizedUrl = async (url, content, channel) => {
         log.info('Output file:', config.makeItGreen(outFileSpec));
         const options = (format == "mp4") ?
             [
-                '-c',
-                'copy',
-                '-bsf:a',
-                'aac_adtstoasc',
-                '-movflags',
-                'faststart',
-                '-map',
-                `0:p:${programStream}:v`,
-                '-map', `0:p:${programStream}:${audioStream}`,
+                '-c', 'copy',
+                '-bsf:a', 'aac_adtstoasc',
+                '-movflags', 'faststart',
+                //'-map', `0:p:${programStream}:v`,
+                //'-map', `0:p:${programStream}:${audioStream}`,
                 '-y'
             ] :
             [
-                '-c',
-                'copy',
-                '-map',
-                `0:p:${programStream}:v`,
-                '-map', `0:p:${programStream}:${audioStream}`,
+                '-c', 'copy',
+                //'-map', `0:p:${programStream}:v`,
+                //'-map', `0:p:${programStream}:${audioStream}`,
                 '-y'
             ];
 
