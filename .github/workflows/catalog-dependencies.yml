@@ -1,3 +1,5 @@
+name: Generate dependency list
+
 on:
  workflow_dispatch:
     branches:
