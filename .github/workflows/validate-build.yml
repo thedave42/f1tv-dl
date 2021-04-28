@@ -19,7 +19,7 @@ on:
     - cron: '6 11 * * 3'
 
 jobs:
-  build-for-macos:    
+  build-and-test:    
     
     runs-on: ubuntu-20.04
 
