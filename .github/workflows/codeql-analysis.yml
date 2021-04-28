@@ -19,6 +19,8 @@ on:
       - '*.md'
   schedule:
     - cron: '35 13 * * 2'
+  workflow_dispatch:
+    
 
 jobs:
   analyze:
