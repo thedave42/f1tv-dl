@@ -14,3 +14,4 @@ datastore*.json
 test-*.js
 *.png
 docker-compose*.yml
+.DS_Store
