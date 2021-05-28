@@ -14,17 +14,17 @@
   "dependencies": {
     "@thedave42/fluent-ffmpeg": "^1.0.3",
     "axios": "^0.21.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
-    "puppeteer": "^9.0.0",
+    "puppeteer": "^9.1.1",
     "puppeteer-extra": "^3.1.18",
     "puppeteer-extra-plugin-adblocker": "^2.11.11",
     "puppeteer-extra-plugin-stealth": "^2.7.8",
-    "yargs": "^16.2.0"
+    "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "eslint": "^7.25.0",
+    "eslint": "^7.27.0",
     "eslint-config-standard": "^16.0.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^11.1.0",
