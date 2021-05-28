@@ -7,20 +7,19 @@
 name: "CodeQL Analysis"
 
 on:
-  push:    
+  push:
     paths-ignore:
-      - '.github/**'
-      - '*.md'
-    branches: [ main ]
+      - ".github/**"
+      - "*.md"
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-      - '.github/**'
-      - '*.md'
+      - ".github/**"
+      - "*.md"
   schedule:
-    - cron: '35 13 * * 2'
+    - cron: "35 13 * * 2"
   workflow_dispatch:
-    
 
 jobs:
   analyze:
@@ -30,44 +29,59 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript' ]
+        language: ["javascript"]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
-        queries: security-and-quality
+      - name: Trigger Event
+        runs: echo This workflow was triggered by a $GITHUB_EVENT_NAME
 
-    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        if: ${{ github.event_name != 'pull_request'}}
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+          # If you wish to specify custom queries, you can do so here or in a config file.
+          # By default, queries listed here will override any specified in a config file.
+          # Prefix the list here with "+" to use these queries and those in the config file.
+          queries: security-and-quality
 
-    # ℹ️ Command-line programs to run using the OS shell.
-    # 📚 https://git.io/JvXDl
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        if: ${{ github.event_name == 'pull_request'}}
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+          # If you wish to specify custom queries, you can do so here or in a config file.
+          # By default, queries listed here will override any specified in a config file.
+          # Prefix the list here with "+" to use these queries and those in the config file.
+          #queries: security-extended
 
-    # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
-    #    and modify them (or add more) to build your code if your project
-    #    uses a compiled language
+      # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+      # If this step fails, then you should remove it and run the build manually (see below)
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
 
-    #- run: |
-    #   make bootstrap
-    #   make release
+      # ℹ️ Command-line programs to run using the OS shell.
+      # 📚 https://git.io/JvXDl
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-      
+      # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
+      #    and modify them (or add more) to build your code if your project
+      #    uses a compiled language
+
+      #- run: |
+      #   make bootstrap
+      #   make release
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+
     #- name: Debug Analysis
     #  uses: zbazztian/codeql-debug@master
     #  with:
@@ -78,12 +92,12 @@ jobs:
     #  with:
     #    name: codeql-debug-results
     #    path: codeql-debug-results
-    #    retention-days: 30    
-      
-      # Before uploading the database as an artifact,
-      # clean up its temporary data to reduce the artifact size,
-      # and zip it so the artifact is a single file.
-      # This reduces the load on the Actions artifact file database.
+    #    retention-days: 30
+
+    # Before uploading the database as an artifact,
+    # clean up its temporary data to reduce the artifact size,
+    # and zip it so the artifact is a single file.
+    # This reduces the load on the Actions artifact file database.
 #    - name: Clean up CodeQL database before upload
 #      id: database-cleanup
 #      env:
@@ -99,7 +113,7 @@ jobs:
 #          DATABASE_ZIP="semmle-code-$LANGUAGE-db.zip"
 #          zip -r "$DATABASE_ZIP" "$DATABASE_DIR"
 #          echo "::set-output name=zip::$DATABASE_ZIP"
-#    - name: Upload CodeQL database        
+#    - name: Upload CodeQL database
 #      uses: actions/upload-artifact@v2
 #      with:
 #        name: semmle-code-${{ matrix.language }}-db
