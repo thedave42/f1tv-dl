@@ -38,7 +38,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Trigger Event
+      - name: Workflow Trigger Event
         run: echo This workflow was triggered by a $GITHUB_EVENT_NAME
 
       # Initializes the CodeQL tools for scanning.
