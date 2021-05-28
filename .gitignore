@@ -7,7 +7,7 @@ download
 .f1tvtoken
 data.json
 test-*.js
-set-token.js
+set-*.js
 datastore*.json
 archive
 datastore*.json
