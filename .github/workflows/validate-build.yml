@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: Workflow Action
-      run: echo This workflow was triggered by $GITHUB_ACTOR
+      run: echo This workflow was triggered by %GITHUB_ACTOR%
     - 
       uses: actions/checkout@v2
 
@@ -44,11 +44,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     -
-      name: Install app and run tests
-      run: |
-        npm i
-        npm test
-      timeout-minutes: 5
+      name: Install app
+      run: npm i
+
+    -
+      name: Run unit tests
+      run: npm test
+      timeout-minutes: 10
       env:
         RACEURL: ${{ secrets.RACEURL }}
         EPISODEURL: ${{ secrets.EPISODEURL }}
@@ -60,7 +62,7 @@ jobs:
         EPISODEID: ${{ secrets.EPISODEID }}
         RACECHANNELID_DATA: ${{ secrets.RACECHANNELID_DATA }}
         RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
-    
+
     -
        name: Upload artifacts on failure
        uses: actions/upload-artifact@v2
