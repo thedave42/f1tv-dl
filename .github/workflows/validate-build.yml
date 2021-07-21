@@ -19,7 +19,8 @@ on:
     - cron: '6 11 * * 3'
 
 jobs:
-  build-and-test:    
+  build-and-test:
+    if: ${{ github.actor != 'depdendabot[bot]'}}
     
     runs-on: windows-2016
 
