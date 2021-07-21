@@ -66,3 +66,4 @@ jobs:
          path: |
           !node_modules/**
           ./datastore-test.json
+          ./chromium_page*.png
