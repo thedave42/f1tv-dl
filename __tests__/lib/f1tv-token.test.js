@@ -14,4 +14,4 @@ test('Test for a valid jwt', () => {
             const today = new Date();
             expect(exp.getTime()).toBeGreaterThanOrEqual(today.getTime());
         });
-}, 60000);
+}, 120000);
