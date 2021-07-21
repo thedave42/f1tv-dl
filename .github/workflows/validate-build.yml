@@ -22,7 +22,7 @@ jobs:
   build-and-test:
     #if: ${{ github.actor != 'depdendabot[bot]'}}
     
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
