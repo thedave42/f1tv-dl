@@ -41,13 +41,13 @@ jobs:
       run: ping -c 4 account.formula1.com
 
     - 
-      name: Check access to login page
-      run: curl -o login.html -X GET https://account.formula1.com/#/en/login
-    
-    - 
       name: Checkout code
       uses: actions/checkout@v2
 
+    - 
+      name: Check access to login page
+      run: curl -o login.html -X GET https://account.formula1.com/#/en/login
+    
     - 
       name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
