@@ -22,18 +22,32 @@ jobs:
   build-and-test:
     #if: ${{ github.actor != 'depdendabot[bot]'}}
     
-    runs-on: windows-2019
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash
 
     strategy:
       matrix:
         node-version: ['14']
 
     steps:
-    - name: Workflow Action
-      run: echo This workflow was triggered by $GITHUB_ACTOR
     - 
+      name: Workflow Actor
+      run: echo This workflow was triggered by $GITHUB_ACTOR
+    
+    -
+      name: Ping api endpoint
+      run: ping -c 4 account.formula1.com
+
+    - 
+      name: Checkout code
       uses: actions/checkout@v2
 
+    - 
+      name: Check access to login page
+      run: curl -o login.html -X GET https://account.formula1.com/#/en/login
+    
     - 
       name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -41,10 +55,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     -
-      run: |
-        npm i
-        npm test
-      timeout-minutes: 5
+      name: Install app
+      run: npm i
+
+    -
+      name: Run unit tests
+      run: npm test
+      timeout-minutes: 3
       env:
         RACEURL: ${{ secrets.RACEURL }}
         EPISODEURL: ${{ secrets.EPISODEURL }}
@@ -56,7 +73,7 @@ jobs:
         EPISODEID: ${{ secrets.EPISODEID }}
         RACECHANNELID_DATA: ${{ secrets.RACECHANNELID_DATA }}
         RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
-    
+
     -
        name: Upload artifacts on failure
        uses: actions/upload-artifact@v2
@@ -66,3 +83,5 @@ jobs:
          path: |
           !node_modules/**
           ./datastore-test.json
+          ./chromium_page*.png
+          ./login.html
