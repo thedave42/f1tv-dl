@@ -22,10 +22,10 @@ jobs:
   build-and-test:
     #if: ${{ github.actor != 'depdendabot[bot]'}}
     
-    runs-on: windows-2019
+    runs-on: macos-latest
     defaults:
       run:
-        shell: cmd
+        shell: bash
 
     strategy:
       matrix:
@@ -34,7 +34,7 @@ jobs:
     steps:
     - 
       name: Workflow Action
-      run: echo This workflow was triggered by %GITHUB_ACTOR%
+      run: echo This workflow was triggered by $GITHUB_ACTOR
     
     -
       name: Ping api endpoint
