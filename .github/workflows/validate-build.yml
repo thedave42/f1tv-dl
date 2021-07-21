@@ -38,7 +38,7 @@ jobs:
     
     -
       name: Ping api endpoint
-      run: ping account.formula1.com
+      run: ping -c 4 account.formula1.com
 
     - 
       name: Check access to login page
