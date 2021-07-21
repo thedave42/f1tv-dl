@@ -50,7 +50,7 @@ jobs:
     -
       name: Run unit tests
       run: npm test
-      timeout-minutes: 10
+      timeout-minutes: 3
       env:
         RACEURL: ${{ secrets.RACEURL }}
         EPISODEURL: ${{ secrets.EPISODEURL }}
