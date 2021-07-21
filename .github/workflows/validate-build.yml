@@ -32,9 +32,20 @@ jobs:
         node-version: ['14']
 
     steps:
-    - name: Workflow Action
-      run: echo This workflow was triggered by %GITHUB_ACTOR%
     - 
+      name: Workflow Action
+      run: echo This workflow was triggered by %GITHUB_ACTOR%
+    
+    -
+      name: Ping api endpoint
+      run: ping account.formula1.com
+
+    - 
+      name: Check access to login page
+      run: curl -X GET https://account.formula1.com/#/en/login >login.html
+    
+    - 
+      name: Checkout code
       uses: actions/checkout@v2
 
     - 
@@ -73,3 +84,4 @@ jobs:
           !node_modules/**
           ./datastore-test.json
           ./chromium_page*.png
+          ./login.html
