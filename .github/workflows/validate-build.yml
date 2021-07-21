@@ -28,6 +28,8 @@ jobs:
         node-version: ['14']
 
     steps:
+    - name: Workflow Action
+      run: echo This workflow was triggered by a $GITHUB_ACTOR
     - 
       uses: actions/checkout@v2
 
