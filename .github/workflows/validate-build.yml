@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - 
-      name: Workflow Action
+      name: Workflow Actor
       run: echo This workflow was triggered by $GITHUB_ACTOR
     
     -
@@ -61,7 +61,7 @@ jobs:
     -
       name: Run unit tests
       run: npm test
-      timeout-minutes: 2
+      timeout-minutes: 3
       env:
         RACEURL: ${{ secrets.RACEURL }}
         EPISODEURL: ${{ secrets.EPISODEURL }}
