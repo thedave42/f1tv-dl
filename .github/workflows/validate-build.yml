@@ -42,7 +42,7 @@ jobs:
 
     - 
       name: Check access to login page
-      run: curl -X GET https://account.formula1.com/#/en/login >login.html
+      run: curl -o login.html -X GET https://account.formula1.com/#/en/login
     
     - 
       name: Checkout code
