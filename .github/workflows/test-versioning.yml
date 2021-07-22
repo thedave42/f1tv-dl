@@ -26,10 +26,7 @@ jobs:
     - 
       name: Set ENV from VERSION
       run:  |
-        echo 'VERSION<<EOF' >> $GITHUB_ENV
         cat VERSION >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-
 
     - name: Display ENV parameters
       run: |
