@@ -37,7 +37,10 @@ jobs:
         run: |
           cat VERSION >> $GITHUB_ENV
 
-      - name: Semver ${{ env.VERSION }} increment as '${{ github.event.inputs.version_type }}'
+      - name: Display ENV parameters
+        run: |
+          echo "::debug::Bump Type: ${{ github.event.inputs.version_type }}"
+          echo "::debug::Version: ${{ env.VERSION }}"
 
       - name: Increment VERSION type '${{ github.event.inputs.version_type }}'
         id: semver
@@ -47,6 +50,7 @@ jobs:
           increment: ${{ github.event.inputs.version_type }}
 
       - name: New version is ${{ steps.semver.outputs.semver }}
+        run: echo "::debug::New version is ${{ steps.semver.outputs.semver }}"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
