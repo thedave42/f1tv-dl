@@ -25,6 +25,8 @@ jobs:
   build:
     
     runs-on: ubuntu-20.04
+    defaults:
+      shell: bash
 
     strategy:
       matrix:
@@ -40,23 +42,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - # Project must build and run before it's released
-      run: |
-        npm i
-        npm test
-      timeout-minutes: 5
-      env:
-        RACEURL: ${{ secrets.RACEURL }}
-        EPISODEURL: ${{ secrets.EPISODEURL }}
-        F1TV_USER: ${{ secrets.F1TV_USER }}
-        F1TV_PASS: ${{ secrets.F1TV_PASS }}
-        RACENAME: ${{ secrets.RACENAME }}
-        RACEID: ${{ secrets.RACEID }}
-        EPISODENAME: ${{ secrets.EPISODENAME }}
-        EPISODEID: ${{ secrets.EPISODEID }}
-        RACECHANNELID_DATA: ${{ secrets.RACECHANNELID_DATA }}
-        RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
-    - 
+    - name: Display input parameters
       run: |
         echo version_bump_type: ${{ github.event.inputs.version_bump_type }}
         echo version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
@@ -71,12 +57,12 @@ jobs:
         version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
         generic_version_template: ${{ github.event.inputs.generic_version_template }}
 
-    - 
+    - name: Show version number
       run: echo version is ${{ steps.semver.outputs.release_version }}
 
     -
       name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v1.5.1
     
     -
       name: Login to GitHub Container Registry
@@ -117,7 +103,3 @@ jobs:
         cwd: ${{ env.PROJECT_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-
