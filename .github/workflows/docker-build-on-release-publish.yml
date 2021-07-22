@@ -33,7 +33,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1.5.1
 
-      - name: Set ENV from VERSION file
+      - name: Set ENV from VERSION
         run: |
           cat VERSION >> $GITHUB_ENV
 
@@ -42,7 +42,7 @@ jobs:
           echo "::debug::Bump Type: ${{ github.event.inputs.version_type }}"
           echo "::debug::Version: ${{ env.VERSION }}"
 
-      - name: Increment VERSION type '${{ github.event.inputs.version_type }}'
+      - name: Simple Semver
         id: semver
         uses: matt-FFFFFF/simple-semver@v0.1.0
         with:
