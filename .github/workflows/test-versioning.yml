@@ -38,6 +38,7 @@ jobs:
           increment: ${{ github.event.inputs.version_type }}
 
       - name: New version is ${{ steps.semver.outputs.semver }}
+        run: echo "::debug::New version is ${{ steps.semver.outputs.semver }}"
 
       - name: Save new VERSION
         run: echo VERSION=${{ steps.semver.outputs.semver }} >VERSION
