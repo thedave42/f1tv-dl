@@ -7,11 +7,11 @@ const user = process.env.F1TV_USER;
 const pass = process.env.F1TV_PASS;
 
 test('Test for a valid jwt', () => {
-    return getF1tvToken(user, pass)
+    return getF1tvToken(user, pass, true)
         .then( token => {
             const decoded = jwtDecode(token);
             const exp = new Date(parseInt(decoded.exp * 1000));
             const today = new Date();
             expect(exp.getTime()).toBeGreaterThanOrEqual(today.getTime());
         });
-}, 60000);
+}, 120000);
