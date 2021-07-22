@@ -37,7 +37,10 @@ jobs:
 
     - 
       name: Set ENV from VERSION
-      run:  source VERSION
+      run:  |
+        set -a
+        source VERSION
+        set +a
 
 
     - name: Display input parameters
