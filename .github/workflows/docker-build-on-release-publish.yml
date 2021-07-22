@@ -52,7 +52,7 @@ jobs:
     - 
       name: Generic Version Bumpr
       id: semver
-      uses: PackagrIO/action-bumpr-generic@v0.0.1
+      uses: PackagrIO/action-bumpr-generic@master
       with:
         version_bump_type: ${{ github.event.inputs.version_bump_type }}
         version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
