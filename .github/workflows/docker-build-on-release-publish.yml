@@ -39,6 +39,7 @@ jobs:
         set -a
         source VERSION
         set +a
+        echo version_type: $VERSION
 
 
     - name: Display input parameters
