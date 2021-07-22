@@ -4,16 +4,15 @@
 name: Docker Build and Source Release
 
 on:
- workflow_dispatch:
+  workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version Bump Type (M)ajor, (m)inor, (p)atch'
+        description: "Version Bump Type (m)ajor, m(i)nor, (p)atch"
         required: true
-        default: 'p'
-    
+        default: "p"
+
 jobs:
   release-build-docker:
-    
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -21,80 +20,70 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['14']
+        node-version: ["14"]
 
     steps:
-    - 
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - 
-      name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1.5.1
-    
-    - 
-      name: Get current VERSION 
-      run:  |
-        cat VERSION >> $GITHUB_ENV
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1.5.1
 
-    - name: Display ENV parameters
-      run: |
-        echo "Version: ${{ env.VERSION }}"
+      - name: Set ENV from VERSION file
+        run: |
+          cat VERSION >> $GITHUB_ENV
 
-    - name: Simple Semver
-      id: semver
-      uses: matt-FFFFFF/simple-semver@v0.1.0
-      with:
-        semver-input: ${{ env.VERSION }}
-        increment: p
+      - name: Semver ${{ env.VERSION }} increment as '${{ github.event.inputs.version_type }}'
 
-    - name: New version is ${{ steps.semver.outputs.semver }}
-      run: echo ${{ steps.semver.outputs.semver }}
-    -
-      name: Login to GitHub Container Registry
-      uses: docker/login-action@v1 
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.CR_PAT }}
-    
-    -
-      name: Docker build and push
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: |
-          ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:latest
-          ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ steps.semver.outputs.semver }}
+      - name: Increment VERSION type '${{ github.event.inputs.version_type }}'
+        id: semver
+        uses: matt-FFFFFF/simple-semver@v0.1.0
+        with:
+          semver-input: ${{ env.VERSION }}
+          increment: ${{ github.event.inputs.version_type }}
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.semver.outputs.semver }}
-        release_name: fltv-dl ${{ steps.semver.outputs.semver }}
-        draft: false
-        prerelease: false
+      - name: New version is ${{ steps.semver.outputs.semver }}
 
-    -
-      name: Save new VERSION
-      run: echo VERSION=${{ steps.semver.outputs.semver }} >VERSION
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
 
-    - 
-      name: Commit changes
-      uses: EndBug/add-and-commit@v5
-      with:
-        author_name: the Dave
-        author_email: dave@digitalnoise.net
-        message: "Bump release version in VERSION file to ${{ steps.semver.outputs.semver }}"
-        cwd: ${{ env.PROJECT_PATH }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:latest
+            ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ steps.semver.outputs.semver }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.semver.outputs.semver }}
+          release_name: fltv-dl ${{ steps.semver.outputs.semver }}
+          draft: false
+          prerelease: false
+
+      - name: Save new VERSION
+        run: echo VERSION=${{ steps.semver.outputs.semver }} >VERSION
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v5
+        with:
+          author_name: the Dave
+          author_email: dave@digitalnoise.net
+          message: "Bump release version in VERSION file to ${{ steps.semver.outputs.semver }}"
+          cwd: ${{ env.PROJECT_PATH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
