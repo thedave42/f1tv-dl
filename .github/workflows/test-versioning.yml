@@ -1,0 +1,61 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Test Versioning
+
+on:
+ workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version Bump Type (M)ajor, (m)inor, (p)atch'
+        required: true
+        default: 'p'
+    
+jobs:
+  test-versioning:
+    
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - 
+      uses: actions/checkout@v2
+
+    - 
+      name: Set ENV from VERSION
+      run:  |
+        echo 'VERSION<<EOF' >> $GITHUB_ENV
+        cat VERSION >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+
+    - name: Display ENV parameters
+      run: |
+        echo "Version: ${{ env.VERSION }}"
+
+    - name: Simple Semver
+      id: semver
+      uses: matt-FFFFFF/simple-semver@v0.1.0
+      with:
+        semver-input: ${{ env.VERSION }}
+        increment: p
+
+    - name: New version is ${{ steps.semver.outputs.semver }}
+      run: echo ${{ steps.semver.outputs.semver }}
+
+    -
+      name: Save new VERSION
+      run: echo VERSION=${{ steps.semver.outputs.semver }} >VERSION
+
+    - 
+      name: Commit changes
+      uses: EndBug/add-and-commit@v5
+      with:
+        author_name: the Dave
+        author_email: dave@digitalnoise.net
+        message: "Bump release version in VERSION file to ${{ steps.semver.outputs.semver }}"
+        cwd: ${{ env.PROJECT_PATH }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
