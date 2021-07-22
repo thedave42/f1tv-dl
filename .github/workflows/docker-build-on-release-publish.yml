@@ -8,21 +8,13 @@ on:
     branches:
       - main
     inputs:
-      version_bump_type:
-        description: 'Version Bump Type (major, minor, patch)'
+      version_type:
+        description: 'Version Bump Type (M)ajor, (m)inor, (p)atch'
         required: true
-        default: 'patch'
-      version_metadata_path:
-        description: 'Path to file containing Version string'
-        required: true
-        default: 'VERSION'
-      generic_version_template:
-        description: 'Go Template used for updating metadata file'
-        required: true
-        default: 'version := "%d.%d.%d"'
+        default: 'p'
     
 jobs:
-  build:
+  Create release and publish Docker image:
     
     runs-on: ubuntu-20.04
     defaults:
@@ -43,23 +35,24 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - 
+      name: Set ENV from VERSION
+      run:  source VERSION
+
+
     - name: Display input parameters
       run: |
-        echo version_bump_type: ${{ github.event.inputs.version_bump_type }}
-        echo version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
-        echo generic_version_template: ${{ github.event.inputs.generic_version_template }}}
+        echo version_type: $VERSION
 
-    - 
-      name: Generic Version Bumpr
+    - name: Simple Semver
       id: semver
-      uses: PackagrIO/action-bumpr-generic@master
+      uses: matt-FFFFFF/simple-semver@v0.1.0
       with:
-        version_bump_type: ${{ github.event.inputs.version_bump_type }}
-        version_metadata_path: ${{ github.event.inputs.version_metadata_path }}
-        generic_version_template: ${{ github.event.inputs.generic_version_template }}
+        semver-input: ${{ env.VERSION }}
+        increment: p
 
-    - name: Show version number
-      run: echo version is ${{ steps.semver.outputs.release_version }}
+    - name: New version is ${{ steps.semver.outputs.semver }}
+      run: echo ${{ steps.semver.outputs.semver }}
 
     -
       name: Set up Docker Buildx
@@ -74,14 +67,14 @@ jobs:
         password: ${{ secrets.CR_PAT }}
     
     -
-      name: Build and push
+      name: Docker build and push
       uses: docker/build-push-action@v2
       with:
         context: .
         push: true
         tags: |
           ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:latest
-          ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ steps.semver.outputs.release_version }}
+          ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ steps.semver.outputs.semver }}
 
     - name: Create Release
       id: create_release
@@ -89,8 +82,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.semver.outputs.release_version }}
-        release_name: fltv-dl ${{ steps.bump_version.outputs.release_version }}
+        tag_name: ${{ steps.semver.outputs.semver }}
+        release_name: fltv-dl ${{ steps.semver.outputs.semver }}
         draft: false
         prerelease: false
 
@@ -100,7 +93,7 @@ jobs:
       with:
         author_name: the Dave
         author_email: dave@digitalnoise.net
-        message: "Bump release version in VERSION file to ${{ steps.semver.outputs.release_version }}"
+        message: "Bump release version in VERSION file to ${{ steps.semver.outputs.semver }}"
         cwd: ${{ env.PROJECT_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
