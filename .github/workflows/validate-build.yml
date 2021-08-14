@@ -19,7 +19,7 @@ on:
     - cron: '6 11 * * 3'
 
 concurrency: 
-  group: build-group
+  group: build-group-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

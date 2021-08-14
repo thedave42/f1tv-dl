@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 concurrency: 
-  group: scan-group
+  group: scan-group-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
