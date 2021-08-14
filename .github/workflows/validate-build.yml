@@ -20,7 +20,7 @@ on:
 
 jobs:
   build-and-test:
-    #if: ${{ github.actor != 'depdendabot[bot]'}}
+    if: github.actor != 'depdendabot[bot]'
     
     runs-on: macos-latest
     defaults:
