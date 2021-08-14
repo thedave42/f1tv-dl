@@ -5,6 +5,9 @@
         "node": true,
         "jest/globals": true
     },
+    "plugins": [
+        "jest"
+    ],
     "extends": "eslint:recommended",
     "globals": {
         "Atomics": "readonly",
@@ -14,5 +17,22 @@
         "ecmaVersion": 2018
     },
     "rules": {
+        "no-unused-vars": [
+            1,
+            {
+                "vars": "local"
+            }
+        ],
+        "indent": [
+            1,
+            4
+        ],
+        "brace-style": [
+            1,
+            "stroustrup",
+            {
+                "allowSingleLine": true
+            }
+        ]
     }
 }
