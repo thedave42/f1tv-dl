@@ -9,17 +9,17 @@ const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdd
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
-    .then( result => {
-        if (isRace(result)) {
-            for ( const stream of result.metadata.additionalStreams ) {
-                const data = (stream.type === 'obc')?`name: ${config.makeItGreen(stream.driverFirstName+' '+stream.driverLastName)}`.padEnd(37) + `number: ${config.makeItGreen(stream.racingNumber)}`.padEnd(22) + `tla: ${config.makeItGreen(stream.title)}`:`name: ${config.makeItGreen(stream.title)}`;
-                log.info(data);
+        .then( result => {
+            if (isRace(result)) {
+                for ( const stream of result.metadata.additionalStreams ) {
+                    const data = (stream.type === 'obc')?`name: ${config.makeItGreen(stream.driverFirstName+' '+stream.driverLastName)}`.padEnd(37) + `number: ${config.makeItGreen(stream.racingNumber)}`.padEnd(22) + `tla: ${config.makeItGreen(stream.title)}`:`name: ${config.makeItGreen(stream.title)}`;
+                    log.info(data);
+                }
             }
-        }
-        else {
-            log.info('This url does not have additonal streams.');
-        }
-    });
+            else {
+                log.info('This url does not have additonal streams.');
+            }
+        });
 };
 
 const getTokenizedUrl = async (url, content, channel) => {
