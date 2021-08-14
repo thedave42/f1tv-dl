@@ -1,8 +1,8 @@
 # f1tv-dl
 
-Watch videos locally from f1tv website 
+Watch videos locally from f1tv website
 
-Note: a valid username/password is required.  The app will save your session so the they will only be required again when your session has expried.
+Note: a valid username/password is required. The app will save your session so the they will only be required again when your session has expried.
 
 ```
 f1tv-dl <url>
@@ -33,20 +33,26 @@ Options:
 ```
 
 ## Use
-Clone the repo and run npm install to install dependencies. 
+
+Clone the repo and run npm install to install dependencies.
 
 (ffmpeg is required and needs to be installed manually)
+
 ```
 git clone https://github.com/thedave42/f1tv-dl.git
 cd f1tv-dl
 npm i -g
 ```
+
 or use Docker (no need to install ffmpeg)
+
 ```
-docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker:latest -o /download <url> [options] 
+docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker:latest -o /download <url> [options]
 ```
-Username and password can also be read from the environment variables `F1TV_USER` and `F1TV_PASS`.  
-## Download a video 
+
+Username and password can also be read from the environment variables `F1TV_USER` and `F1TV_PASS`.
+
+## Download a video
 
 Log in to your f1tv account, navigate to the video you want to watch, and copy the url from your browser.
 
