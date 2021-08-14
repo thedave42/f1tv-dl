@@ -10,6 +10,10 @@ on:
         description: "Version Bump Type (m)ajor, m(i)nor, (p)atch"
         required: true
         default: "p"
+      release_description:
+        description: "Release notes"
+        required: true
+        default: "enter release notes"
 
 jobs:
   release-build-docker:
@@ -76,6 +80,7 @@ jobs:
         with:
           tag_name: ${{ steps.semver.outputs.semver }}
           release_name: fltv-dl ${{ steps.semver.outputs.semver }}
+          body: ${{ github.event.inputs.release_description }}
           draft: false
           prerelease: false
 
