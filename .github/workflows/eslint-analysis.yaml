@@ -45,7 +45,7 @@ jobs:
       - name: Upload results to GitHub
         uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: nodegoat-eslint.sarif
+          sarif_file: f1tv-dl-eslint.sarif
 
       - name: Upload sarif as artifact
         uses: actions/upload-artifact@v2
