@@ -37,20 +37,26 @@ jobs:
       - name: Run npm i
         run: |
           npm i
+
       - name: Run ESLint
-        run: |
-          ./node_modules/.bin/eslint -f @microsoft/eslint-formatter-sarif -o f1tv-dl-eslint.sarif . || exit 0
-        # ./node_modules/.bin/eslint . || exit 0
-
-      - name: Upload results to GitHub
-        uses: github/codeql-action/upload-sarif@v1
+        uses: thedave42/ghas-eslint-action@main
         with:
-          sarif_file: f1tv-dl-eslint.sarif
+          src-dir: .
 
-      - name: Upload sarif as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: f1tv-dl-eslint-results
-          path: |
-            !node_modules/**
-            f1tv-dl-eslint.sarif
+      #- name: Run ESLint
+      #  run: |
+      #    ./node_modules/.bin/eslint -f @microsoft/eslint-formatter-sarif -o f1tv-dl-eslint.sarif . || exit 0
+      #  # ./node_modules/.bin/eslint . || exit 0
+
+      #- name: Upload results to GitHub
+      #  uses: github/codeql-action/upload-sarif@v1
+      #  with:
+      #    sarif_file: f1tv-dl-eslint.sarif
+
+      #- name: Upload sarif as artifact
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: f1tv-dl-eslint-results
+      #    path: |
+      #      !node_modules/**
+      #      f1tv-dl-eslint.sarif
