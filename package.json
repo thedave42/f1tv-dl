@@ -14,7 +14,7 @@
   "dependencies": {
     "@microsoft/eslint-formatter-sarif": "^2.1.5",
     "@thedave42/fluent-ffmpeg": "^1.0.3",
-    "axios": "^0.21.1",
+    "axios": "^0.21.3",
     "dotenv": "^10.0.0",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
