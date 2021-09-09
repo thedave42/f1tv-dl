@@ -16,6 +16,7 @@
     "@thedave42/fluent-ffmpeg": "^1.0.3",
     "axios": "^0.21.1",
     "dotenv": "^10.0.0",
+    "inquirer": "^8.1.2",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
     "puppeteer": "^10.2.0",
