@@ -3,6 +3,7 @@ const config = require('./lib/config');
 const yargs = require('yargs');
 const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
+const inquirer = require('inquirer');
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken } = require('./lib/f1tv-api');
@@ -39,12 +40,12 @@ const getTokenizedUrl = async (url, content, channel) => {
 
 (async () => {
     try {
-        const {
+        let {
             url: url,
             channel: channel,
             channelList: channelList,
-            programStream: programStream,
-            audioStream: audioStream,
+            //programStream: programStream,
+            //audioStream: audioStream,
             format: format,
             outputDirectory: outputDir,
             username: f1Username,
@@ -69,7 +70,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         default: null,
                         alias: 'c'
                     })
-                    .option('program-stream', {
+                    /*.option('program-stream', {
                         type: 'string',
                         desc: 'Specify the program for the video stream',
                         default: '5',
@@ -80,7 +81,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         desc: 'Specify audio stream index to download',
                         default: 'a',
                         alias: 'a'
-                    })
+                    })*/
                     .option('format', {
                         type: 'string',
                         desc: 'Specify mp4 or TS output (default mp4)',
@@ -143,7 +144,26 @@ const getTokenizedUrl = async (url, content, channel) => {
         catch (e) {
             log.debug(e);
             if (e.response.status >= 400 && e.response.status <= 499) {
-                if (f1Username == null || f1Password == null ) throw new Error('Please provide a valid username and password.');
+                if (f1Username == null || f1Password == null ) {
+                    const userPrompt = await inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'f1Username',
+                            message: 'Enter your F1TV user name:',
+                            default: f1Username
+                        },
+                        {
+                            type: 'password',
+                            name: 'f1Password',
+                            message: 'Enter your F1TV password:',
+                            default: f1Password
+                        }
+                    ]);
+                    f1Username = userPrompt.f1Username;
+                    f1Password = userPrompt.f1Password;
+                    if (f1Username == null || f1Password == null || f1Username.length == 0 || f1Password.length == 0)
+                        throw new Error('Please provide a valid username and password.');
+                }
                 log.info('Login required.  This may take 10-30 seconds.');
                 await saveF1tvToken(f1Username, f1Password);
                 log.info('Authorization token encrypted and stored for future use at:', config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
