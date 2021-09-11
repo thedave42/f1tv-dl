@@ -1,6 +1,6 @@
 {
   "name": "f1tv-dl",
-  "version": "1.0.0",
+  "version": "0.18.0",
   "description": "Watch videos from f1tv locally",
   "main": "index.js",
   "bin": {
@@ -12,10 +12,10 @@
   "author": "dave@digitalnoise.net",
   "license": "ISC",
   "dependencies": {
-    "@microsoft/eslint-formatter-sarif": "^2.1.5",
     "@thedave42/fluent-ffmpeg": "^1.0.3",
-    "axios": "^0.21.1",
+    "axios": "^0.21.3",
     "dotenv": "^10.0.0",
+    "inquirer": "^8.1.2",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
     "puppeteer": "^10.2.0",
@@ -25,14 +25,15 @@
     "yargs": "^17.1.1"
   },
   "devDependencies": {
+    "@microsoft/eslint-formatter-sarif": "^2.1.5",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^24.4.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^4.0.2",
-    "jest": "^27.0.6",
+    "jest": "^27.1.0",
     "jwt-decode": "^3.1.2"
   },
   "repository": {
