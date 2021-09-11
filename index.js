@@ -70,7 +70,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         default: null,
                         alias: 'c'
                     })
-                    .option('program-stream', {
+                    /*.option('program-stream', {
                         type: 'string',
                         desc: 'Specify the program for the video stream',
                         default: '5',
@@ -81,7 +81,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         desc: 'Specify audio stream index to download',
                         default: 'a',
                         alias: 'a'
-                    })
+                    })*/
                     .option('format', {
                         type: 'string',
                         desc: 'Specify mp4 or TS output (default mp4)',
