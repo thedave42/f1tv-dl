@@ -44,8 +44,8 @@ const getTokenizedUrl = async (url, content, channel) => {
             url: url,
             channel: channel,
             channelList: channelList,
-            //programStream: programStream,
-            //audioStream: audioStream,
+            programStream: programStream,
+            audioStream: audioStream,
             format: format,
             outputDirectory: outputDir,
             username: f1Username,
@@ -70,7 +70,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         default: null,
                         alias: 'c'
                     })
-                    /*.option('program-stream', {
+                    .option('program-stream', {
                         type: 'string',
                         desc: 'Specify the program for the video stream',
                         default: '5',
@@ -78,10 +78,10 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('audio-stream', {
                         type: 'string',
-                        desc: 'Specify audio stream index to download',
-                        default: 'a',
+                        desc: 'Specify audio stream language to download',
+                        default: 'eng',
                         alias: 'a'
-                    })*/
+                    })
                     .option('format', {
                         type: 'string',
                         desc: 'Specify mp4 or TS output (default mp4)',
@@ -185,14 +185,14 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-c', 'copy',
                 '-bsf:a', 'aac_adtstoasc',
                 '-movflags', 'faststart',
-                //'-map', `0:p:${programStream}:v`,
-                //'-map', `0:p:${programStream}:${audioStream}`,
+                '-map', `0:p:${programStream}:v`,
+                '-map', `0:m:language:${audioStream}`,
                 '-y'
             ] :
             [
                 '-c', 'copy',
-                //'-map', `0:p:${programStream}:v`,
-                //'-map', `0:p:${programStream}:${audioStream}`,
+                '-map', `0:p:${programStream}:v`,
+                '-map', `0:m:language:${audioStream}`,
                 '-y'
             ];
 
