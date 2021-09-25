@@ -182,15 +182,19 @@ const getTokenizedUrl = async (url, content, channel) => {
         log.info('Output file:', config.makeItGreen(outFileSpec));
         const options = (format == "mp4") ?
             [
-                '-c', 'copy',
-                '-bsf:a', 'aac_adtstoasc',
+                //'-c', 'copy',
+                //'-bsf:a', 'aac_adtstoasc',
+                '-c:v', 'copy',
+                '-c:a', 'aac', '-ar', '48000', '-b:a', '256k',
                 '-movflags', 'faststart',
                 '-map', `0:p:${programStream}:v`,
                 '-map', `0:m:language:${audioStream}`,
                 '-y'
             ] :
             [
-                '-c', 'copy',
+                //'-c', 'copy',
+                '-c:v', 'copy',
+                '-c:a', 'aac', '-ar', '48000', '-b:a', '256k',
                 '-map', `0:p:${programStream}:v`,
                 '-map', `0:m:language:${audioStream}`,
                 '-y'
