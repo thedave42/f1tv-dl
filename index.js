@@ -44,7 +44,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             url: url,
             channel: channel,
             channelList: channelList,
-            programStream: programStream,
+            //programStream: programStream,
             audioStream: audioStream,
             format: format,
             outputDirectory: outputDir,
@@ -70,12 +70,12 @@ const getTokenizedUrl = async (url, content, channel) => {
                         default: null,
                         alias: 'c'
                     })
-                    .option('program-stream', {
+                    /*.option('program-stream', {
                         type: 'string',
                         desc: 'Specify the program for the video stream',
                         default: '5',
                         alias: 'v'
-                    })
+                    })*/
                     .option('audio-stream', {
                         type: 'string',
                         desc: 'Specify audio stream language to download',
@@ -179,7 +179,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         const outFile = (isRace(content) && channel !== null) ?`${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}`:`${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
-        programStream = await getProgramStreamId(f1tvUrl);
+        const programStream = await getProgramStreamId(f1tvUrl);
 
         log.debug(programStream);
 
