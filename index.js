@@ -6,7 +6,7 @@ const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
-const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken } = require('./lib/f1tv-api');
+const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
@@ -179,6 +179,12 @@ const getTokenizedUrl = async (url, content, channel) => {
         const outFile = (isRace(content) && channel !== null) ?`${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}`:`${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
+        programStream = await getProgramStreamId(f1tvUrl);
+
+        log.debug(programStream);
+
+        //process.exit(0);
+
         log.info('Output file:', config.makeItGreen(outFileSpec));
         const options = (format == "mp4") ?
             [
@@ -199,6 +205,8 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-map', `0:m:language:${audioStream}`,
                 '-y'
             ];
+
+        
 
         return ffmpeg()
             .input(f1tvUrl)
