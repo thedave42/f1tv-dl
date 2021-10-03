@@ -21,34 +21,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set ENV from VERSION
+      - name: Read package.json
+        id: read-package-json
         run: |
-          cat VERSION >> $GITHUB_ENV
+          content=`cat ./path/to/package.json`
+          # the following lines are only required for multi line json
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          # end of optional handling for multi line json
+          echo "::set-output name=package-json::$content"
 
-      - name: Display ENV parameters
+      - name: Output version
         run: |
-          echo "::debug::Bump Type: ${{ github.event.inputs.version_type }}"
-          echo "::debug::Version: ${{ env.VERSION }}"
-
-      - name: Simple Semver
-        id: semver
-        uses: matt-FFFFFF/simple-semver@v0.1.0
-        with:
-          semver-input: ${{ env.VERSION }}
-          increment: ${{ github.event.inputs.version_type }}
-
-      - name: New version is ${{ steps.semver.outputs.semver }}
-        run: echo "::debug::New version is ${{ steps.semver.outputs.semver }}"
-
-      - name: Save new VERSION
-        run: echo VERSION=${{ steps.semver.outputs.semver }} >VERSION
-
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v5
-        with:
-          author_name: the Dave
-          author_email: dave@digitalnoise.net
-          message: "Bump release version in VERSION file to ${{ steps.semver.outputs.semver }}"
-          cwd: ${{ env.PROJECT_PATH }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "${{fromJson(steps.read-package-json.outputs.package-json).version}}"
