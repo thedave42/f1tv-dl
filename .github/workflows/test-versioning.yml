@@ -32,7 +32,7 @@ jobs:
 
       - name: Run npm version ${{ github.event.inputs.version_type }}
         run: |
-          npm version ${{ github.event.inputs.version_type }}
+          npm version ${{ github.event.inputs.version_type }} --no-git-tag-version
 
       - name: Read package.json
         id: read-package-json
