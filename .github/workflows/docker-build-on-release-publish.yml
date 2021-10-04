@@ -109,15 +109,12 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Save new VERSION
-        run: echo VERSION=${{ steps.semver.outputs.semver }} >VERSION
-
       - name: Commit changes
         uses: EndBug/add-and-commit@v5
         with:
           author_name: the Dave
           author_email: dave@digitalnoise.net
-          message: "Bump release version in VERSION file to ${{ steps.semver.outputs.semver }}"
+          message: "Bump package.json version to ${{ steps.semver.outputs.semver }}"
           cwd: ${{ env.PROJECT_PATH }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
