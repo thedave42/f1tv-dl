@@ -51,3 +51,4 @@ jobs:
           echo "::set-output name=semver::${{fromJson(steps.read-package-json.outputs.package-json).version}}"
 
       - name: New version is ${{ steps.semver.outputs.semver }}
+        run: echo "New version is ${{ steps.semver.outputs.semver }}"
