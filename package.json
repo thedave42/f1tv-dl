@@ -20,7 +20,7 @@
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
     "puppeteer": "^10.2.0",
-    "puppeteer-extra": "^3.1.18",
+    "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-adblocker": "^2.12.0",
     "puppeteer-extra-plugin-stealth": "^2.8.1",
     "yargs": "^17.1.1"
