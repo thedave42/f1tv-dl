@@ -45,6 +45,9 @@ jobs:
           # end of optional handling for multi line json
           echo "::set-output name=package-json::$content"
 
-      - name: Output version
+      - name: Set version
+        id: semver
         run: |
-          echo "${{fromJson(steps.read-package-json.outputs.package-json).version}}"
+          echo "::set-output name=semver::${{fromJson(steps.read-package-json.outputs.package-json).version}}"
+
+      - name: New version is ${{ steps.semver.outputs.semver }}
