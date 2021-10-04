@@ -9,7 +9,7 @@ on:
       version_type:
         description: "npm version [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease [--preid=<prerelease-id>] | from-git]"
         required: true
-        default: "p"
+        default: "patch"
 
 jobs:
   test-versioning:
@@ -32,7 +32,7 @@ jobs:
 
       - name: Run npm version ${{ github.event.inputs.version_type }}
         run: |
-          npm version ${{ github.event.inputs.version_bump_type }}
+          npm version ${{ github.event.inputs.version_type }}
 
       - name: Read package.json
         id: read-package-json
