@@ -179,7 +179,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         const outFile = (isRace(content) && channel !== null) ?`${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}`:`${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
-        const programStream = await getProgramStreamId(f1tvUrl);
+        const [programStream, audioStreamId] = await getProgramStreamId(f1tvUrl, audioStream);
+        const audioStreamMapping = (audioStreamId !== -1) ? `0:p:${programStream}:a:${audioStreamId}` : `0:p:${programStream}:a`;
 
         log.debug(programStream);
 
@@ -194,7 +195,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-c:a', 'aac', '-ar', '48000', '-b:a', '256k',
                 '-movflags', 'faststart',
                 '-map', `0:p:${programStream}:v`,
-                '-map', `0:m:language:${audioStream}`,
+                '-map', audioStreamMapping,
                 '-y'
             ] :
             [
@@ -202,7 +203,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-c:v', 'copy',
                 '-c:a', 'aac', '-ar', '48000', '-b:a', '256k',
                 '-map', `0:p:${programStream}:v`,
-                '-map', `0:m:language:${audioStream}`,
+                '-map', audioStreamMapping,
                 '-y'
             ];
 
