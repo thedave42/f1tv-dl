@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@thedave42/fluent-ffmpeg": "^1.0.3",
-    "axios": "^0.21.3",
+    "axios": "^0.23.0",
     "dotenv": "^10.0.0",
     "hls-parser": "^0.10.4",
     "inquirer": "^8.1.5",
