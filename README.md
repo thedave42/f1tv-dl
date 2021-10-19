@@ -17,8 +17,8 @@ Options:
   -a, --audio-stream                                   [string] [default: "eng"]
   -f, --format                  [string] [choices: "mp4", "ts"] [default: "mp4"]
   -o, --output-directory                                [string] [default: null]
-  -U, --username                 [string] [default: "dave_pda@digitalnoise.net"]
-  -P, --password                       [string] [default: "bell_GRIS@shun4smow"]
+  -U, --username                 [string] [default: "null"]
+  -P, --password                       [string] [default: "null"]
       --channel-list                                  [boolean] [default: false]
   -l, --log-level
           [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
