@@ -204,7 +204,6 @@ const getTokenizedUrl = async (url, content, channel) => {
             [
                 '-probesize', '24M',
                 '-rtbufsize', '2147M',
-                '-c:a', 'aac'
             ];
 
         const options = (format == "mp4") ?
