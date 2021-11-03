@@ -7,7 +7,8 @@
     "f1tv-dl": "index.js"
   },
   "scripts": {
-    "test": "node --trace-warnings node_modules/jest/bin/jest.js --detectOpenHandles --no-cache"
+    "test": "node --trace-warnings node_modules/jest/bin/jest.js --detectOpenHandles --no-cache",
+    "preinstall": "npx npm-force-resolutions"
   },
   "author": "dave@digitalnoise.net",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "inquirer": "^8.2.0",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
+    "minimist": "^0.2.1",
     "puppeteer": "^10.4.0",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-adblocker": "^2.12.0",
@@ -33,9 +35,12 @@
     "eslint-plugin-jest": "^25.2.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.1",
-    "eslint-plugin-standard": "^4.0.2",
+    "eslint-plugin-standard": "^4.1.0",
     "jest": "^27.3.1",
     "jwt-decode": "^3.1.2"
+  },
+  "resolutions": {
+    "minimist": "^0.2.1"
   },
   "repository": {
     "type": "git",
