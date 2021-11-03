@@ -12,8 +12,8 @@
   "author": "dave@digitalnoise.net",
   "license": "ISC",
   "dependencies": {
-    "@thedave42/fluent-ffmpeg": "^1.0.3",
-    "axios": "^0.23.0",
+    "@thedave42/fluent-ffmpeg": "^1.0.4",
+    "axios": "^0.24.0",
     "dotenv": "^10.0.0",
     "hls-parser": "^0.10.4",
     "inquirer": "^8.2.0",
@@ -32,7 +32,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-jest": "^25.2.2",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "eslint-plugin-standard": "^4.0.2",
     "jest": "^27.3.1",
     "jwt-decode": "^3.1.2"
