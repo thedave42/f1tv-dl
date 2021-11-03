@@ -181,18 +181,38 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         const [programStream, audioStreamId] = await getProgramStreamId(f1tvUrl, audioStream);
         const audioStreamMapping = (audioStreamId !== -1) ? `0:p:${programStream}:a:${audioStreamId}` : `0:p:${programStream}:a`;
+        const audioCodecParameters = (isRace(content)) ? ['aac', '-ar', '48000', '-b:a', '256k'] : ['copy'];
+
+        if ( audioStreamId !== -1 ) {
+            log.info(`Found audio stream that matches ${config.makeItGreen(audioStream)}.`);
+            log.info(`Using audio stream id ${config.makeItGreen(audioStreamId)}.`);
+        }
+        else {
+            log.info(`Unable to find a match for audio stream that matches ${config.makeItGreen(audioStream)}.`);
+            log.info('Using default audio stream.');
+        }
+
+        if ( isRace(content) ) {
+            log.info(`Downsampling race audio to 48kHz for maximum compatibility.`);
+        }
 
         log.debug(programStream);
 
-        //process.exit(0);
-
         log.info('Output file:', config.makeItGreen(outFileSpec));
+
+        const inputOptions =
+            [
+                '-probesize', '24M',
+                '-rtbufsize', '2147M',
+                '-c:a', 'aac'
+            ];
+
         const options = (format == "mp4") ?
             [
                 //'-c', 'copy',
                 //'-bsf:a', 'aac_adtstoasc',
                 '-c:v', 'copy',
-                '-c:a', 'aac', '-ar', '48000', '-b:a', '256k',
+                '-c:a', ...audioCodecParameters,
                 '-movflags', 'faststart',
                 '-map', `0:p:${programStream}:v`,
                 '-map', audioStreamMapping,
@@ -201,7 +221,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             [
                 //'-c', 'copy',
                 '-c:v', 'copy',
-                '-c:a', 'aac', '-ar', '48000', '-b:a', '256k',
+                '-c:a', ...audioCodecParameters,
                 '-map', `0:p:${programStream}:v`,
                 '-map', audioStreamMapping,
                 '-y'
@@ -211,6 +231,7 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         return ffmpeg()
             .input(f1tvUrl)
+            .inputOptions(inputOptions)
             .outputOptions(options)
             .on('start', commandLine => {
                 log.debug('Executing command:', config.makeItGreen(commandLine));
