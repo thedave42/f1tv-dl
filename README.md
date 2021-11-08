@@ -20,7 +20,7 @@ Options:
                                                         [string] [default: null]
   -p, --include-pit-lane-audio  Include the Pit Lane Channel audio stream as a
                                 secondary audio channel. (Only works for content
-                                with additional video feeds)
+                                with a Pit Lane Channel)
                                                       [boolean] [default: false]
   -a, --audio-stream            Specify audio stream language to download
                                                        [string] [default: "eng"]
