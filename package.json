@@ -20,7 +20,7 @@
     "inquirer": "^8.2.0",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.7.1",
-    "minimist": "^0.2.1",
+    "minimist": "^1.2.5",
     "puppeteer": "^10.4.0",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-adblocker": "^2.12.0",
