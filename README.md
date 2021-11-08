@@ -41,7 +41,7 @@ Options:
 
 Clone the repo and run npm install to install dependencies.
 
-([ffmpeg](https://www.ffmpeg.org/) is required and needs to be installed manually)
+([ffmpeg](https://www.ffmpeg.org/) is required and needs to be present in the path)
 
 ```
 git clone https://github.com/thedave42/f1tv-dl.git
