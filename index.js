@@ -75,7 +75,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('include-pit-lane-audio', {
                         type: 'boolean',
-                        desc: 'Include the Pit Lane Channel audio stream as a secondary audio channel. (Only works for races)',
+                        desc: 'Include the Pit Lane Channel audio stream as a secondary audio channel. (Only works for content with additional video feeds)',
                         default: false,
                         alias: 'p'
                     })

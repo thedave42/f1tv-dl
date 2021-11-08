@@ -8,19 +8,32 @@ Note: a valid username/password is required. The app will save your session so t
 f1tv-dl <url>
 
 Positionals:
-  url                                                                   [string]
+  url  The f1tv url for the video                                       [string]
 
 Options:
-      --help              Show help                                    [boolean]
-      --version           Show version number                          [boolean]
-  -c, --channel                                         [string] [default: null]
-  -a, --audio-stream                                   [string] [default: "eng"]
-  -f, --format                  [string] [choices: "mp4", "ts"] [default: "mp4"]
-  -o, --output-directory                                [string] [default: null]
-  -U, --username                 [string] [default: "null"]
-  -P, --password                       [string] [default: "null"]
-      --channel-list                                  [boolean] [default: false]
-  -l, --log-level
+      --help                    Show help                              [boolean]
+      --version                 Show version number                    [boolean]
+  -c, --channel                 Choose an alternate channel for a race or race
+                                replay. Use the channel-list option to see a
+                                list of channels and specify name/number/tla to
+                                stream alternate channel.
+                                                        [string] [default: null]
+  -p, --include-pit-lane-audio  Include the Pit Lane Channel audio stream as a
+                                secondary audio channel. (Only works for content
+                                with additional video feeds)
+                                                      [boolean] [default: false]
+  -a, --audio-stream            Specify audio stream language to download
+                                                       [string] [default: "eng"]
+  -f, --format                  Specify mp4 or TS output (default mp4)
+                                [string] [choices: "mp4", "ts"] [default: "mp4"]
+  -o, --output-directory        Specify a directory for the downloaded file
+                                                        [string] [default: null]
+  -U, --username                F1TV User name          [string] [default: null]
+  -P, --password                F1TV password           [string] [default: null]
+      --channel-list            Provides a list of channels available from url
+                                (for videos with multiple cameras)
+                                                      [boolean] [default: false]
+  -l, --log-level               set the log level
           [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
 ```
 
