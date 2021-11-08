@@ -208,9 +208,9 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         let pitUrl = await getTokenizedUrl(url, content, 'pit');
         if (includePitLaneAudio && isRace(content)) {
-            log.info(`Adding Pit Land Channel audio as secondary audio channel.`);
+            log.info(`Adding Pit Lane Channel audio as second audio channel.`);
 
-            
+
 
             log.debug('pit url:', pitUrl);
 
@@ -222,13 +222,9 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-map', `0:p:${programStream}:a:${audioStreamId}`,
                 '-map', `1:a:0`,
             ];
-            
+
             audioCodecParameters = [
                 '-c:a', 'copy',
-                //`-c:0:p:${programStream}:a:${audioStreamId}`, 'aac',
-                //`-ar:0:p:${programStream}:a:${audioStreamId}`, '48000',
-                //`-b:0:p:${programStream}:a:${audioStreamId}`, '256k',
-                //`-c:1:a:0`, 'copy'
                 `-metadata:s:a:0`, `language=${audioStream}`,
                 `-metadata:s:a:1`, 'language=tld'
             ];
@@ -265,31 +261,61 @@ const getTokenizedUrl = async (url, content, channel) => {
 
 
 
-        return ffmpeg()
-            .input(f1tvUrl)
-            .input(pitUrl)
-            .inputOptions(inputOptions)
-            .outputOptions(options)
-            .on('start', commandLine => {
-                log.debug('Executing command:', config.makeItGreen(commandLine));
-            })
-            .on('codecData', data => {
-                log.debug(data.video);
-                log.debug(data.audio);
-                log.info('File duration:', config.makeItGreen(data.duration), '\n');
-            })
-            .on('progress', info => {
-                const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
-                process.stdout.write(outStr);
-            })
-            .on('end', () => {
-                log.info('\nDownload complete.');
-            })
-            .on('error', e => {
-                log.error('ffmpeg error:', e.message);
-                log.debug(e);
-            })
-            .save(outFileSpec);
+        return (includePitLaneAudio && isRace(content))
+            ?  // Use this command when adding pitlane audio
+            ffmpeg()
+                .input(f1tvUrl)
+                .input(pitUrl)
+                .inputOptions(inputOptions)
+                .outputOptions(options)
+                .on('start', commandLine => {
+                    log.debug('Executing command:', config.makeItGreen(commandLine));
+                })
+                .on('codecData', data => {
+                    log.debug(data.video);
+                    log.debug(data.audio);
+                    log.info('File duration:', config.makeItGreen(data.duration), '\n');
+                })
+                .on('progress', info => {
+                    const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                    process.stdout.write(outStr);
+                })
+                .on('end', () => {
+                    log.info('\nDownload complete.');
+                })
+                .on('error', e => {
+                    log.error('ffmpeg error:', e.message);
+                    log.debug(e);
+                })
+                .save(outFileSpec)
+
+            : // Use this command for everything else
+            ffmpeg()
+                .input(f1tvUrl)
+                .outputOptions(options)
+                .on('start', commandLine => {
+                    log.debug('Executing command:', config.makeItGreen(commandLine));
+                })
+                .on('codecData', data => {
+                    log.debug(data.video);
+                    log.debug(data.audio);
+                    log.info('File duration:', config.makeItGreen(data.duration), '\n');
+                })
+                .on('progress', info => {
+                    const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                    process.stdout.write(outStr);
+                })
+                .on('end', () => {
+                    log.info('\nDownload complete.');
+                })
+                .on('error', e => {
+                    log.error('ffmpeg error:', e.message);
+                    log.debug(e);
+                })
+                .save(outFileSpec)
+        ;
+
+
     }
     catch (e) {
         log.error('Error:', e.message);
