@@ -69,7 +69,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('channel', {
                         type: 'string',
-                        desc: 'Choose an alternate channel for a race or race replay. Use the channel-list option to see a list of channels and specify name/number/tla to stream alternate channel.',
+                        desc: 'Choose an alternate channel for a content with multiple video feeds. Use the channel-list option to see a list of channels and specify name/number/tla to select alternate channel.',
                         default: null,
                         alias: 'c'
                     })
@@ -188,7 +188,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         let audioCodecParameters = ['-c:a', 'copy'];
         let inputOptions = [
             '-probesize', '24M',
-            '-rtbufsize', '2147M'
+            '-rtbufsize', '2147M',
+            '-live_start_index', '0'
         ];
 
         if (audioStreamId !== -1) {
@@ -265,6 +266,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             ?  // Use this command when adding pitlane audio
             ffmpeg()
                 .input(f1tvUrl)
+                .inputOptions(['-live_start_index', '0'])
                 .input(pitUrl)
                 .inputOptions(inputOptions)
                 .outputOptions(options)
@@ -292,6 +294,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             : // Use this command for everything else
             ffmpeg()
                 .input(f1tvUrl)
+                .inputOptions(['-live_start_index', '0'])
                 .outputOptions(options)
                 .on('start', commandLine => {
                     log.debug('Executing command:', config.makeItGreen(commandLine));

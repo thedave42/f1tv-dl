@@ -13,10 +13,10 @@ Positionals:
 Options:
       --help                    Show help                              [boolean]
       --version                 Show version number                    [boolean]
-  -c, --channel                 Choose an alternate channel for a race or race
-                                replay. Use the channel-list option to see a
-                                list of channels and specify name/number/tla to
-                                stream alternate channel.
+  -c, --channel                 Choose an alternate channel for a content with
+                                multiple video feeds. Use the channel-list
+                                option to see a list of channels and specify
+                                name/number/tla to select alternate channel.
                                                         [string] [default: null]
   -p, --include-pit-lane-audio  Include the Pit Lane Channel audio stream as a
                                 secondary audio channel. (Only works for content
