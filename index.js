@@ -6,7 +6,7 @@ const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 
 // eventually make this an arguement
-const itsoffset = '-00:00:01.350';
+//const itsoffset = '-00:00:01.350';
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
@@ -48,6 +48,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             channel: channel,
             channelList: channelList,
             includePitLaneAudio: includePitLaneAudio,
+            itsoffset: itsoffset,
             audioStream: audioStream,
             format: format,
             outputDirectory: outputDir,
@@ -78,6 +79,18 @@ const getTokenizedUrl = async (url, content, channel) => {
                         desc: 'Include the Pit Lane Channel audio stream as a secondary audio channel. (Only works for content with a Pit Lane Channel)',
                         default: false,
                         alias: 'p'
+                    })
+                    .option('itsoffset', {
+                        type: 'string',
+                        desc: 'Used to sync Pit Lane Channel Audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
+                        alias: 't',
+                        default: '00:00:01.350',
+                        coerce: key => {
+                            const pattern = new RegExp(/^-?\d{2}:\d{2}:\d{2}\.\d{3}/);
+                            if (!pattern.test(key))
+                                throw new Error(`Invalid format for itsoffset: ${key}. Use (-)hh:mm:ss.SSS`);
+                            return key;
+                        }
                     })
                     .option('audio-stream', {
                         type: 'string',
@@ -188,8 +201,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         let audioCodecParameters = ['-c:a', 'copy'];
         let inputOptions = [
             '-probesize', '24M',
-            '-rtbufsize', '2147M',
-            '-live_start_index', '0'
+            '-rtbufsize', '2147M'
+            //'-live_start_index', '0'
         ];
 
         if (audioStreamId !== -1) {
@@ -216,7 +229,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             log.debug('pit url:', pitUrl);
 
             inputOptions.push(...[
-                '-itsoffset', itsoffset,
+                '-itsoffset', itsoffset
             ]);
 
             audioStreamMapping = [
@@ -227,7 +240,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             audioCodecParameters = [
                 '-c:a', 'copy',
                 `-metadata:s:a:0`, `language=${audioStream}`,
-                `-metadata:s:a:1`, 'language=tld'
+                `-metadata:s:a:1`, 'language=lat'
             ];
 
         }
@@ -238,7 +251,7 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         //process.exit(0);
 
-        // ffmpeg -i "" -itsoffset -00:00:01.350 -i "" -c copy -map 0:p:5:v -map -0:p:5:a:m:language:eng -map 1:p:0:a -metadata:s:a:0 language=eng -metadata:s:a:1 language=tld test.ts
+        // ffmpeg -i "" -itsoffset -00:00:01.350 -i "" -c copy -map 0:p:5:v -map -0:p:5:a:m:language:eng -map 1:p:0:a -metadata:s:a:0 language=eng -metadata:s:a:1 language=lat test.ts
 
 
 
@@ -266,7 +279,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             ?  // Use this command when adding pitlane audio
             ffmpeg()
                 .input(f1tvUrl)
-                .inputOptions(['-live_start_index', '0'])
+                //.inputOptions(['-live_start_index', '0'])
                 .input(pitUrl)
                 .inputOptions(inputOptions)
                 .outputOptions(options)
@@ -294,7 +307,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             : // Use this command for everything else
             ffmpeg()
                 .input(f1tvUrl)
-                .inputOptions(['-live_start_index', '0'])
+                //.inputOptions(['-live_start_index', '0'])
                 .outputOptions(options)
                 .on('start', commandLine => {
                     log.debug('Executing command:', config.makeItGreen(commandLine));
