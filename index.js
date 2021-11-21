@@ -224,8 +224,6 @@ const getTokenizedUrl = async (url, content, channel) => {
         if (includePitLaneAudio && isRace(content)) {
             log.info(`Adding Pit Lane Channel audio as second audio channel.`);
 
-
-
             log.debug('pit url:', pitUrl);
 
             inputOptions.push(...[
@@ -240,9 +238,10 @@ const getTokenizedUrl = async (url, content, channel) => {
             audioCodecParameters = [
                 '-c:a', 'copy',
                 `-metadata:s:a:0`, `language=${audioStream}`,
-                `-metadata:s:a:1`, 'language=lat'
+                `-disposition:a:0`, `0`,
+                `-metadata:s:a:1`, 'language=lat',
+                `-disposition:a:1`, `default`
             ];
-
         }
 
         log.debug(programStream);
@@ -329,7 +328,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     log.debug(e);
                 })
                 .save(outFileSpec)
-        ;
+            ;
 
 
     }
