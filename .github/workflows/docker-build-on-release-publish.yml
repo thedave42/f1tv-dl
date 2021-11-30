@@ -26,10 +26,6 @@ jobs:
     outputs:
       semver: ${{ steps.semver.outputs.semver }}
 
-    strategy:
-      matrix:
-        node-version: ["14"]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
