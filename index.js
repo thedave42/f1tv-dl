@@ -327,10 +327,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     log.error('ffmpeg error:', e.message);
                     log.debug(e);
                 })
-                .save(outFileSpec)
-            ;
-
-
+                .save(outFileSpec);
     }
     catch (e) {
         log.error('Error:', e.message);

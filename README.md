@@ -22,6 +22,9 @@ Options:
                                 secondary audio channel. (Only works for content
                                 with a Pit Lane Channel)
                                                       [boolean] [default: false]
+  -t, --itsoffset               Used to sync Pit Lane Channel Audio. Specify the
+                                time offset as '(-)hh:mm:ss.SSS'
+                                              [string] [default: "00:00:01.350"]
   -a, --audio-stream            Specify audio stream language to download
                                                        [string] [default: "eng"]
   -f, --format                  Specify mp4 or TS output (default mp4)
@@ -34,8 +37,7 @@ Options:
                                 (for videos with multiple cameras)
                                                       [boolean] [default: false]
   -l, --log-level               set the log level
-          [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
-```
+          [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]```
 
 ## Use
 
