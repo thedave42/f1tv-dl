@@ -5,15 +5,18 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 
+// eventually make this an arguement
+//const itsoffset = '-00:00:01.350';
+
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
-        .then( result => {
+        .then(result => {
             if (isRace(result)) {
-                for ( const stream of result.metadata.additionalStreams ) {
-                    const data = (stream.type === 'obc')?`name: ${config.makeItGreen(stream.driverFirstName+' '+stream.driverLastName)}`.padEnd(37) + `number: ${config.makeItGreen(stream.racingNumber)}`.padEnd(22) + `tla: ${config.makeItGreen(stream.title)}`:`name: ${config.makeItGreen(stream.title)}`;
+                for (const stream of result.metadata.additionalStreams) {
+                    const data = (stream.type === 'obc') ? `name: ${config.makeItGreen(stream.driverFirstName + ' ' + stream.driverLastName)}`.padEnd(37) + `number: ${config.makeItGreen(stream.racingNumber)}`.padEnd(22) + `tla: ${config.makeItGreen(stream.title)}` : `name: ${config.makeItGreen(stream.title)}`;
                     log.info(data);
                 }
             }
@@ -26,7 +29,7 @@ const getSessionChannelList = (url) => {
 const getTokenizedUrl = async (url, content, channel) => {
     let f1tvUrl;
     if (isRace(content) && channel !== null) {
-        const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
+        const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
         const contentParams = getContentParams(url);
         const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
         f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
@@ -44,7 +47,8 @@ const getTokenizedUrl = async (url, content, channel) => {
             url: url,
             channel: channel,
             channelList: channelList,
-            //programStream: programStream,
+            includePitLaneAudio: includePitLaneAudio,
+            itsoffset: itsoffset,
             audioStream: audioStream,
             format: format,
             outputDirectory: outputDir,
@@ -66,16 +70,28 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('channel', {
                         type: 'string',
-                        desc: 'Choose an alternate channel for a race or race replay. Use the channel-list option to see a list of channels and specify name/number/tla to stream alternate channel.',
+                        desc: 'Choose an alternate channel for a content with multiple video feeds. Use the channel-list option to see a list of channels and specify name/number/tla to select alternate channel.',
                         default: null,
                         alias: 'c'
                     })
-                    /*.option('program-stream', {
+                    .option('include-pit-lane-audio', {
+                        type: 'boolean',
+                        desc: 'Include the Pit Lane Channel audio stream as a secondary audio channel. (Only works for content with a Pit Lane Channel)',
+                        default: false,
+                        alias: 'p'
+                    })
+                    .option('itsoffset', {
                         type: 'string',
-                        desc: 'Specify the program for the video stream',
-                        default: '5',
-                        alias: 'v'
-                    })*/
+                        desc: 'Used to sync Pit Lane Channel Audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
+                        alias: 't',
+                        default: '00:00:01.350',
+                        coerce: key => {
+                            const pattern = new RegExp(/^-?\d{2}:\d{2}:\d{2}\.\d{3}/);
+                            if (!pattern.test(key))
+                                throw new Error(`Invalid format for itsoffset: ${key}. Use (-)hh:mm:ss.SSS`);
+                            return key;
+                        }
+                    })
                     .option('audio-stream', {
                         type: 'string',
                         desc: 'Specify audio stream language to download',
@@ -136,7 +152,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         if (channelList) return getSessionChannelList(url);
 
         const content = await getContentInfo(url);
-        
+
         let f1tvUrl = '';
         try {
             f1tvUrl = await getTokenizedUrl(url, content, channel);
@@ -144,7 +160,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         catch (e) {
             log.debug(e);
             if (e.response.status >= 400 && e.response.status <= 499) {
-                if (f1Username == null || f1Password == null ) {
+                if (f1Username == null || f1Password == null) {
                     const userPrompt = await inquirer.prompt([
                         {
                             type: 'input',
@@ -171,19 +187,25 @@ const getTokenizedUrl = async (url, content, channel) => {
             }
             else {
                 throw e;
-            }            
+            }
         }
 
         log.debug('tokenized url:', f1tvUrl);
         const ext = (format == "mp4") ? 'mp4' : 'ts';
-        const outFile = (isRace(content) && channel !== null) ?`${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}`:`${getContentParams(url).name}.${ext}`;
+        const outFile = (isRace(content) && channel !== null) ? `${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}` : `${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
         const [programStream, audioStreamId] = await getProgramStreamId(f1tvUrl, audioStream);
-        const audioStreamMapping = (audioStreamId !== -1) ? `0:p:${programStream}:a:${audioStreamId}` : `0:p:${programStream}:a`;
-        const audioCodecParameters = (isRace(content)) ? ['aac', '-ar', '48000', '-b:a', '256k'] : ['copy'];
+        let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:p:${programStream}:a:${audioStreamId}`] : ['-map', `0:p:${programStream}:a`];
+        //let audioCodecParameters = (false) ? ['-c:a', 'aac', '-ar', '48000', '-b:a', '256k'] : ['-c:a', 'copy']; // leaving this in case they switch races back to 96kHz audio
+        let audioCodecParameters = ['-c:a', 'copy'];
+        let inputOptions = [
+            '-probesize', '24M',
+            '-rtbufsize', '2147M'
+            //'-live_start_index', '0'
+        ];
 
-        if ( audioStreamId !== -1 ) {
+        if (audioStreamId !== -1) {
             log.info(`Found audio stream that matches ${config.makeItGreen(audioStream)}.`);
             log.info(`Using audio stream id ${config.makeItGreen(audioStreamId)}.`);
         }
@@ -192,66 +214,120 @@ const getTokenizedUrl = async (url, content, channel) => {
             log.info('Using default audio stream.');
         }
 
-        if ( isRace(content) ) {
+        /*
+        if (isRace(content)) {
             log.info(`Downsampling race audio to 48kHz for maximum compatibility.`);
+        }
+        */
+
+        let pitUrl = await getTokenizedUrl(url, content, 'pit');
+        if (includePitLaneAudio && isRace(content)) {
+            log.info(`Adding Pit Lane Channel audio as second audio channel.`);
+
+            log.debug('pit url:', pitUrl);
+
+            inputOptions.push(...[
+                '-itsoffset', itsoffset
+            ]);
+
+            audioStreamMapping = [
+                '-map', `0:p:${programStream}:a:${audioStreamId}`,
+                '-map', `1:a:0`,
+            ];
+
+            audioCodecParameters = [
+                '-c:a', 'copy',
+                `-metadata:s:a:0`, `language=${audioStream}`,
+                `-disposition:a:0`, `0`,
+                `-metadata:s:a:1`, 'language=lat',
+                `-disposition:a:1`, `default`
+            ];
         }
 
         log.debug(programStream);
 
         log.info('Output file:', config.makeItGreen(outFileSpec));
 
-        const inputOptions =
-            [
-                '-probesize', '24M',
-                '-rtbufsize', '2147M',
-            ];
+        //process.exit(0);
+
+        // ffmpeg -i "" -itsoffset -00:00:01.350 -i "" -c copy -map 0:p:5:v -map -0:p:5:a:m:language:eng -map 1:p:0:a -metadata:s:a:0 language=eng -metadata:s:a:1 language=lat test.ts
+
+
 
         const options = (format == "mp4") ?
             [
-                //'-c', 'copy',
-                //'-bsf:a', 'aac_adtstoasc',
-                '-c:v', 'copy',
-                '-c:a', ...audioCodecParameters,
-                '-movflags', 'faststart',
                 '-map', `0:p:${programStream}:v`,
-                '-map', audioStreamMapping,
+                ...audioStreamMapping,
+                `-c:v`, 'copy',
+                ...audioCodecParameters,
+                '-bsf:a', 'aac_adtstoasc',
+                '-movflags', 'faststart',
                 '-y'
             ] :
             [
-                //'-c', 'copy',
-                '-c:v', 'copy',
-                '-c:a', ...audioCodecParameters,
                 '-map', `0:p:${programStream}:v`,
-                '-map', audioStreamMapping,
+                ...audioStreamMapping,
+                `-c:v`, 'copy',
+                ...audioCodecParameters,
                 '-y'
             ];
 
-        
 
-        return ffmpeg()
-            .input(f1tvUrl)
-            .inputOptions(inputOptions)
-            .outputOptions(options)
-            .on('start', commandLine => {
-                log.debug('Executing command:', config.makeItGreen(commandLine));
-            })
-            .on('codecData', data => {
-                log.debug(data.video);
-                log.debug(data.audio);
-                log.info('File duration:', config.makeItGreen(data.duration),'\n');
-            })
-            .on('progress', info => {
-                const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
-                process.stdout.write(outStr);
-            })
-            .on('end', () => {
-                log.info('\nDownload complete.');
-            })
-            .on('error', e => {
-                log.error('ffmpeg error:', e.message);
-                log.debug(e);
-            })
-            .save(outFileSpec);
+
+        return (includePitLaneAudio && isRace(content))
+            ?  // Use this command when adding pitlane audio
+            ffmpeg()
+                .input(f1tvUrl)
+                //.inputOptions(['-live_start_index', '0'])
+                .input(pitUrl)
+                .inputOptions(inputOptions)
+                .outputOptions(options)
+                .on('start', commandLine => {
+                    log.debug('Executing command:', config.makeItGreen(commandLine));
+                })
+                .on('codecData', data => {
+                    log.debug(data.video);
+                    log.debug(data.audio);
+                    log.info('File duration:', config.makeItGreen(data.duration), '\n');
+                })
+                .on('progress', info => {
+                    const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                    process.stdout.write(outStr);
+                })
+                .on('end', () => {
+                    log.info('\nDownload complete.');
+                })
+                .on('error', e => {
+                    log.error('ffmpeg error:', e.message);
+                    log.debug(e);
+                })
+                .save(outFileSpec)
+
+            : // Use this command for everything else
+            ffmpeg()
+                .input(f1tvUrl)
+                //.inputOptions(['-live_start_index', '0'])
+                .outputOptions(options)
+                .on('start', commandLine => {
+                    log.debug('Executing command:', config.makeItGreen(commandLine));
+                })
+                .on('codecData', data => {
+                    log.debug(data.video);
+                    log.debug(data.audio);
+                    log.info('File duration:', config.makeItGreen(data.duration), '\n');
+                })
+                .on('progress', info => {
+                    const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                    process.stdout.write(outStr);
+                })
+                .on('end', () => {
+                    log.info('\nDownload complete.');
+                })
+                .on('error', e => {
+                    log.error('ffmpeg error:', e.message);
+                    log.debug(e);
+                })
+                .save(outFileSpec);
     }
     catch (e) {
         log.error('Error:', e.message);
