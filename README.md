@@ -38,7 +38,7 @@ Options:
                                                       [boolean] [default: false]
   -l, --log-level               set the log level
           [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]```
-
+```
 ## Use
 
 Clone the repo and run npm install to install dependencies.
