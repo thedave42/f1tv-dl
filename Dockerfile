@@ -11,7 +11,7 @@ RUN apt-get install -y ffmpeg
 WORKDIR /f1tv
 COPY . /f1tv
 
-# Puppeteer needs to be installed discretely to force Chromium to download
+# --unsafe-perm is required for preinstall script in package.json
 RUN npm i --omit=dev --unsafe-perm
 
 ENTRYPOINT [ "/bin/sh", "run.sh" ]
