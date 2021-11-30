@@ -16,43 +16,29 @@ on:
         default: "enter release notes"
 
 jobs:
-  release-build-docker:
+  update-version-info:
+    name: Executing npm version ${{ github.event.inputs.version_type }}
     runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash
+
+    outputs:
+      semver: ${{ steps.semver.outputs.semver }}
 
     strategy:
       matrix:
         node-version: ["14"]
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js ${{ matrix.node-version }} environment
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-
-#  OLD VERSION LOGIC
-#      - name: Set ENV from VERSION
-#        run: |
-#          cat VERSION >> $GITHUB_ENV
-#
-#      - name: Display ENV parameters
-#        run: |
-#          echo "::debug::Bump Type: ${{ github.event.inputs.version_type }}"
-#          echo "::debug::Version: ${{ env.VERSION }}"
-#
-#      - name: Simple Semver
-#        id: semver
-#        uses: matt-FFFFFF/simple-semver@v0.1.0
-#        with:
-#          semver-input: ${{ env.VERSION }}
-#          increment: ${{ github.event.inputs.version_type }}
-#
-#      - name: New version is ${{ steps.semver.outputs.semver }}
-#        run: echo "::debug::New version is ${{ steps.semver.outputs.semver }}"
+          node-version: "14"
 
       - name: Run npm version ${{ github.event.inputs.version_type }}
         run: |
@@ -77,6 +63,31 @@ jobs:
       - name: New version is ${{ steps.semver.outputs.semver }}
         run: echo "New version is ${{ steps.semver.outputs.semver }}"
 
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v5
+        with:
+          author_name: the Dave
+          author_email: dave@digitalnoise.net
+          message: "Bump package.json version to ${{ steps.semver.outputs.semver }}"
+          cwd: ${{ env.PROJECT_PATH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-publish-docker:
+    name: Create docker image
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    needs: update-version-info
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Creating docker image version ${{ needs.update-version-info.outputs.semver }}
+        run: echo "Creating docker image version ${{ needs.update-version-info.outputs.semver }}"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1.5.1
 
@@ -94,8 +105,22 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:latest
-            ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ steps.semver.outputs.semver }}
+            ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ needs.update-version-info.outputs.semver }}
 
+  create-release:
+    name: Creating GitHub release
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    needs: update-version-info
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Creating release version ${{ needs.update-version-info.outputs.semver }}
+        run: echo "Creating release version ${{ needs.update-version-info.outputs.semver }}"
 
       - name: Create Release
         id: create_release
@@ -103,18 +128,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.semver.outputs.semver }}
-          release_name: fltv-dl ${{ steps.semver.outputs.semver }}
+          tag_name: ${{ needs.update-version-info.outputs.semver }}
+          release_name: fltv-dl ${{ needs.update-version-info.outputs.semver }}
           body: ${{ github.event.inputs.release_description }}
           draft: false
           prerelease: false
-
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v5
-        with:
-          author_name: the Dave
-          author_email: dave@digitalnoise.net
-          message: "Bump package.json version to ${{ steps.semver.outputs.semver }}"
-          cwd: ${{ env.PROJECT_PATH }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
