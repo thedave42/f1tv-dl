@@ -12,7 +12,7 @@ WORKDIR /f1tv
 COPY . /f1tv
 
 # Puppeteer needs to be installed discretely to force Chromium to download
+RUN npm i --only=production
 RUN npm i puppeteer 
-RUN npm i --production
 
 ENTRYPOINT [ "/bin/sh", "run.sh" ]
