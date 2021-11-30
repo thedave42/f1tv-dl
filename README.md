@@ -54,7 +54,7 @@ npm i -g
 or use Docker (no need to install ffmpeg)
 
 ```
-docker run -v \<your local directory\>:/download ghcr.io/thedave42/f1tv-dl-docker:latest -o /download <url> [options]
+docker run -v <your local directory>:/download ghcr.io/thedave42/f1tv-dl-docker:latest -o /download <url> [options]
 ```
 
 Username and password can also be read from the environment variables `F1TV_USER` and `F1TV_PASS`.
