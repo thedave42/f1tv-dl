@@ -2,11 +2,13 @@ const config = require('./lib/config');
 
 const yargs = require('yargs');
 const log = require('loglevel');
-const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 
-// eventually make this an arguement
-//const itsoffset = '-00:00:01.350';
+const ffmpegPath = require('ffmpeg-static');
+const ffprobe = require('ffprobe-static');
+const ffmpeg = require('@thedave42/fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobe.path);
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
@@ -151,6 +153,8 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         if (channelList) return getSessionChannelList(url);
 
+        log.debug(`Using ffmpeg in: ${ffmpegPath}`);
+
         const content = await getContentInfo(url);
 
         let f1tvUrl = '';
@@ -247,13 +251,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         log.debug(programStream);
 
         log.info('Output file:', config.makeItGreen(outFileSpec));
-
-        //process.exit(0);
-
-        // ffmpeg -i "" -itsoffset -00:00:01.350 -i "" -c copy -map 0:p:5:v -map -0:p:5:a:m:language:eng -map 1:p:0:a -metadata:s:a:0 language=eng -metadata:s:a:1 language=lat test.ts
-
-
-
+         
         const options = (format == "mp4") ?
             [
                 '-map', `0:p:${programStream}:v`,
@@ -271,8 +269,6 @@ const getTokenizedUrl = async (url, content, channel) => {
                 ...audioCodecParameters,
                 '-y'
             ];
-
-
 
         return (includePitLaneAudio && isRace(content))
             ?  // Use this command when adding pitlane audio
