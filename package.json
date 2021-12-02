@@ -16,6 +16,8 @@
     "@thedave42/fluent-ffmpeg": "^1.0.4",
     "axios": "^0.24.0",
     "dotenv": "^10.0.0",
+    "ffmpeg-static": "^4.4.0",
+    "ffprobe-static": "^3.0.0",
     "hls-parser": "^0.10.4",
     "inquirer": "^8.2.0",
     "log-timestamp": "^0.3.0",
