@@ -1,5 +1,5 @@
 {
-  "name": "f1tv-dl",
+  "name": "@thedave42/f1tv-dl",
   "version": "0.23.0",
   "description": "Watch videos from f1tv locally",
   "main": "index.js",
