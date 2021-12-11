@@ -199,11 +199,13 @@ const getTokenizedUrl = async (url, content, channel) => {
         let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:p:${programStream}:a:${audioStreamId}`] : ['-map', `0:p:${programStream}:a`];
         //let audioCodecParameters = (false) ? ['-c:a', 'aac', '-ar', '48000', '-b:a', '256k'] : ['-c:a', 'copy']; // leaving this in case they switch races back to 96kHz audio
         let audioCodecParameters = ['-c:a', 'copy'];
-        let inputOptions = [
+        const inputOptions = [
             '-probesize', '24M',
+            '-analyzeduration', '6M',
             '-rtbufsize', '2147M'
-            //'-live_start_index', '0'
         ];
+
+        let pitInputOptions = [...inputOptions];
 
         if (audioStreamId !== -1) {
             log.info(`Found audio stream that matches ${config.makeItGreen(audioStream)}.`);
@@ -226,8 +228,9 @@ const getTokenizedUrl = async (url, content, channel) => {
 
             log.debug('pit url:', pitUrl);
 
-            inputOptions.push(...[
-                '-itsoffset', itsoffset
+            pitInputOptions.push(...[
+                '-itsoffset', itsoffset,
+                //'-live_start_index', '50'
             ]);
 
             audioStreamMapping = [
@@ -278,9 +281,9 @@ const getTokenizedUrl = async (url, content, channel) => {
             ?  // Use this command when adding pitlane audio
             ffmpeg()
                 .input(f1tvUrl)
-                //.inputOptions(['-live_start_index', '0'])
-                .input(pitUrl)
                 .inputOptions(inputOptions)
+                .input(pitUrl)
+                .inputOptions(pitInputOptions)
                 .outputOptions(options)
                 .on('start', commandLine => {
                     log.debug('Executing command:', config.makeItGreen(commandLine));
@@ -306,7 +309,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             : // Use this command for everything else
             ffmpeg()
                 .input(f1tvUrl)
-                //.inputOptions(['-live_start_index', '0'])
+                .inputOptions(inputOptions)
                 .outputOptions(options)
                 .on('start', commandLine => {
                     log.debug('Executing command:', config.makeItGreen(commandLine));

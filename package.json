@@ -13,7 +13,7 @@
   "author": "dave@digitalnoise.net",
   "license": "ISC",
   "dependencies": {
-    "@thedave42/fluent-ffmpeg": "^1.0.4",
+    "@thedave42/fluent-ffmpeg": "^1.0.5",
     "axios": "^0.24.0",
     "dotenv": "^10.0.0",
     "hls-parser": "^0.10.4",
