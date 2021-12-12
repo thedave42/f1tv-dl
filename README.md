@@ -24,9 +24,13 @@ Options:
                                                       [boolean] [default: false]
   -t, --itsoffset               Used to sync Pit Lane Channel Audio. Specify the
                                 time offset as '(-)hh:mm:ss.SSS'
-                                              [string] [default: "00:00:01.350"]
+                                              [string] [default: "00:00:00.000"]
   -a, --audio-stream            Specify audio stream language to download
                                                        [string] [default: "eng"]
+  -s, --video-size              Specify video size to download as WxH or best
+                                down select the highest resolution. (e.g.
+                                640x360, 1920x1080, best)
+                                                      [string] [default: "best"]
   -f, --format                  Specify mp4 or TS output (default mp4)
                                 [string] [choices: "mp4", "ts"] [default: "mp4"]
   -o, --output-directory        Specify a directory for the downloaded file
@@ -37,7 +41,7 @@ Options:
                                 (for videos with multiple cameras)
                                                       [boolean] [default: false]
   -l, --log-level               set the log level
-          [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]```
+          [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
 ```
 ## Use
 
