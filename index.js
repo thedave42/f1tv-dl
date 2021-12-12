@@ -50,6 +50,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             includePitLaneAudio: includePitLaneAudio,
             itsoffset: itsoffset,
             audioStream: audioStream,
+            videoSize: videoSize,
             format: format,
             outputDirectory: outputDir,
             username: f1Username,
@@ -98,6 +99,12 @@ const getTokenizedUrl = async (url, content, channel) => {
                         default: 'eng',
                         alias: 'a'
                     })
+                    .option('video-size', {
+                        type: 'string',
+                        desc: 'Specify video size to download as WxH or best down select the highest resolution. (e.g. 640x360, 1920x1080, best)',
+                        default: 'best',
+                        alias: 's'
+                    })                    
                     .option('format', {
                         type: 'string',
                         desc: 'Specify mp4 or TS output (default mp4)',
@@ -195,7 +202,10 @@ const getTokenizedUrl = async (url, content, channel) => {
         const outFile = (isRace(content) && channel !== null) ? `${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}` : `${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
-        const [programStream, audioStreamId] = await getProgramStreamId(f1tvUrl, audioStream);
+        const plDetails = await getProgramStreamId(f1tvUrl, audioStream, videoSize);
+        log.debug(plDetails);
+        const programStream = plDetails.videoId;
+        const audioStreamId = plDetails.audioId;
         let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:p:${programStream}:a:${audioStreamId}`] : ['-map', `0:p:${programStream}:a`];
         //let audioCodecParameters = (false) ? ['-c:a', 'aac', '-ar', '48000', '-b:a', '256k'] : ['-c:a', 'copy']; // leaving this in case they switch races back to 96kHz audio
         let audioCodecParameters = ['-c:a', 'copy'];
