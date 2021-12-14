@@ -27,6 +27,7 @@ const getSessionChannelList = (url) => {
 };
 
 const getTokenizedUrl = async (url, content, channel) => {
+    console.log(`getTokenizedUrl(${url}, ${content}, ${channel})`)
     let f1tvUrl;
     if (isRace(content) && channel !== null) {
         const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
