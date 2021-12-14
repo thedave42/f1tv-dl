@@ -17,7 +17,7 @@ Options:
                                 multiple video feeds. Use the channel-list
                                 option to see a list of channels and specify
                                 name/number/tla to select alternate channel.
-                                                        [string] [default: null]
+                                (case sensitive)        [string] [default: null]
   -p, --include-pit-lane-audio  Include the Pit Lane Channel audio stream as a
                                 secondary audio channel. (Only works for content
                                 with a Pit Lane Channel)

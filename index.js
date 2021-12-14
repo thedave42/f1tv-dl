@@ -27,9 +27,12 @@ const getSessionChannelList = (url) => {
 };
 
 const getTokenizedUrl = async (url, content, channel) => {
+    console.log(`getTokenizedUrl(${url}, ${content}, ${channel})`)
     let f1tvUrl;
     if (isRace(content) && channel !== null) {
         const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
+        console.log('returned');
+        console.log(stream);
         const contentParams = getContentParams(url);
         const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
         f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
@@ -71,7 +74,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('channel', {
                         type: 'string',
-                        desc: 'Choose an alternate channel for a content with multiple video feeds. Use the channel-list option to see a list of channels and specify name/number/tla to select alternate channel.',
+                        desc: 'Choose an alternate channel for a content with multiple video feeds. Use the channel-list option to see a list of channels and specify name/number/tla to select alternate channel. (case sensitive)',
                         default: null,
                         alias: 'c'
                     })
@@ -232,8 +235,9 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
         */
 
-        let pitUrl = await getTokenizedUrl(url, content, 'pit');
+        let pitUrl;
         if (includePitLaneAudio && isRace(content)) {
+            pitUrl = await getTokenizedUrl(url, content, 'PIT')
             log.info(`Adding Pit Lane Channel audio as second audio channel.`);
 
             log.debug('pit url:', pitUrl);
