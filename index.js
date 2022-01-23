@@ -162,6 +162,9 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         let f1tvUrl = '';
         try {
+            log.debug(url);
+            log.debug(content);
+            log.debug(channel);
             f1tvUrl = await getTokenizedUrl(url, content, channel);
         }
         catch (e) {
