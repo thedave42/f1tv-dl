@@ -30,17 +30,20 @@ test('Check for valid episode id', () => {
     expect(params.id).toBe(episodeId);
 });
 
-test('Validate altername race data stream', async () => {
-    const content = await getContentInfo(raceUrl);
-    const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'data');
-    const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
-    expect(channelId).toBe(raceChannelIdData);
+test('Validate altername race data stream', () => {
+    getContentInfo(raceUrl)
+        .then(content => {
+            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'data');
+            const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+            expect(channelId).toBe(raceChannelIdData);       
+        });
 });
 
-test('Validate altername driver data stream', async () => {
-    const content = await getContentInfo(raceUrl);
-    const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'ham');
-    const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
-    expect(channelId).toBe(raceChannelIdHam);
+test('Validate altername driver data stream', () => {
+    getContentInfo(raceUrl)
+        .then(content => {
+            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'ham');
+            const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+            expect(channelId).toBe(raceChannelIdHam);        
+        });
 });
-
