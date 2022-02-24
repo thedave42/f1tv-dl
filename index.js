@@ -84,7 +84,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         type: 'string',
                         desc: 'Used to sync Pit Lane Channel Audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
                         alias: 't',
-                        default: '00:00:01.350',
+                        default: '00:00:00.000',
                         coerce: key => {
                             const pattern = new RegExp(/^-?\d{2}:\d{2}:\d{2}\.\d{3}/);
                             if (!pattern.test(key))
