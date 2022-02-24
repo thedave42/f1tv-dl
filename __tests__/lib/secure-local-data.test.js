@@ -2,12 +2,13 @@ const DataStore = require('../../lib/secure-local-data');
 const fs = require('fs');
 const { encrypt, decrypt } = require('../../lib/secure');
 const temp = require('temp');
+const path = require('path');
 temp.track();
 
 const testValue = 'This is a test string 12390389450145f @#$%!#$!@^%!#$ja:"{#@$(%!F>';
 const testKey = 'token';
 const testDir = temp.mkdirSync('secure-local-data.test');
-const testFile = `${testDir}/datastore-test.json`;
+const testFile = path.join(testDir, `datastore-test.json`);
 
 test('Datastore file is successfully created', () => {
     const ds = new DataStore(testFile);
