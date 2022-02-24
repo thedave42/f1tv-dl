@@ -1,10 +1,13 @@
 const DataStore = require('../../lib/secure-local-data');
 const fs = require('fs');
 const { encrypt, decrypt } = require('../../lib/secure');
+const temp = require('temp');
+temp.track();
 
 const testValue = 'This is a test string 12390389450145f @#$%!#$!@^%!#$ja:"{#@$(%!F>';
 const testKey = 'token';
-const testFile = './datastore-test.json';
+const testDir = temp.mkdirSync('secure-local-data.test');
+const testFile = `${testDir}/datastore-test.json`;
 
 test('Datastore file is successfully created', () => {
     const ds = new DataStore(testFile);
@@ -37,21 +40,27 @@ test('Datastore file is writeable', () => {
     expect(wOk).toBeTruthy();
 });
 
-test('Add a value to the datastore and make sure it\'s encrypted', () => {
-    const ds = new DataStore(testFile);
-    const record = ds.add(testKey, testValue);
-    expect(record[testKey]).toBe(encrypt(testValue));
-    /*ds.add(testKey, testValue)    
-        .then( record => {
-            expect(record[testKey]).toBe(encrypt(testValue)); 
-        })*/
-});
-
-test('Get a value from the datastore and make sure it\'s decrypted', () => {
+test(`Add a value to the datastore and make sure it's encrypted\n\ttestFile: ${testFile}\n\ttestKey: ${testKey}\n\ttestValue: ${testValue}`, () => {
     const ds = new DataStore(testFile);
     let ok = false;
     try {
-        fs.accessSync(testFile, fs.constants.R_OK | fs.constants.W_OK);
+        fs.accessSync(testFile, fs.constants.W_OK);
+        ok = true;
+    }
+    catch (e) {
+        ok = false;
+    }
+    expect(ok).toBeTruthy();    
+    
+    const record = ds.add(testKey, testValue);
+    expect(record[testKey]).toBe(encrypt(testValue));
+});
+
+test(`Get a value from the datastore and make sure it's decrypted\n\ttestFile: ${testFile}\n\ttestKey: ${testKey}\n\ttestValue: ${testValue}`, () => {
+    const ds = new DataStore(testFile);
+    let ok = false;
+    try {
+        fs.accessSync(testFile, fs.constants.R_OK);
         ok = true;
     }
     catch (e) {
