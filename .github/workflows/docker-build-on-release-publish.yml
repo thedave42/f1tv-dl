@@ -109,7 +109,9 @@ jobs:
     defaults:
       run:
         shell: bash
-    needs: update-version-info
+    needs: 
+      - update-version-info
+      - build-and-publish-docker
 
     steps:
       - name: Checkout code
