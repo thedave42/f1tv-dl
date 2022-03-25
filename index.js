@@ -5,11 +5,8 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 
-// eventually make this an arguement
-//const itsoffset = '-00:00:01.350';
-
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
-const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
+const { getContentInfo, getContentStreamUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
@@ -31,12 +28,12 @@ const getTokenizedUrl = async (url, content, channel) => {
     if (isRace(content) && channel !== null) {
         const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
         const contentParams = getContentParams(url);
-        const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
-        f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
+        f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
     }
     else {
         const contentParams = getContentParams(url);
-        f1tvUrl = await getContentStreamUrl(contentParams.id);
+        const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, "INTERNATIONAL");
+        f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
     }
     return f1tvUrl;
 };
@@ -222,7 +219,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
         */
 
-        let pitUrl = await getTokenizedUrl(url, content, 'pit');
+        let pitUrl = await getTokenizedUrl(url, content, 'f1 live');
         if (includePitLaneAudio && isRace(content)) {
             log.info(`Adding Pit Lane Channel audio as second audio channel.`);
 
