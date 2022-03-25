@@ -28,15 +28,19 @@ const getSessionChannelList = (url) => {
 
 const getTokenizedUrl = async (url, content, channel) => {
     let f1tvUrl;
+    //console.log(`${content} / ${channel}`);
     if (isRace(content) && channel !== null) {
+        //console.log(JSON.stringify(content, 2, 4));
         const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
+        //console.log(stream);
         const contentParams = getContentParams(url);
-        const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
-        f1tvUrl = await getContentStreamUrl(contentParams.id, channelId);
+        //const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
+        f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
     }
     else {
         const contentParams = getContentParams(url);
-        f1tvUrl = await getContentStreamUrl(contentParams.id);
+        const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, "INTERNATIONAL");
+        f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
     }
     return f1tvUrl;
 };
@@ -222,7 +226,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
         */
 
-        let pitUrl = await getTokenizedUrl(url, content, 'pit');
+        let pitUrl = await getTokenizedUrl(url, content, 'f1 live');
         if (includePitLaneAudio && isRace(content)) {
             log.info(`Adding Pit Lane Channel audio as second audio channel.`);
 
