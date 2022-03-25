@@ -5,11 +5,8 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 
-// eventually make this an arguement
-//const itsoffset = '-00:00:01.350';
-
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
-const { getContentInfo, getContentStreamUrl, getChannelIdFromPlaybackUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
+const { getContentInfo, getContentStreamUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
@@ -28,13 +25,9 @@ const getSessionChannelList = (url) => {
 
 const getTokenizedUrl = async (url, content, channel) => {
     let f1tvUrl;
-    //console.log(`${content} / ${channel}`);
     if (isRace(content) && channel !== null) {
-        //console.log(JSON.stringify(content, 2, 4));
         const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
-        //console.log(stream);
         const contentParams = getContentParams(url);
-        //const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
         f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
     }
     else {
