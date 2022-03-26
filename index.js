@@ -31,7 +31,7 @@ const getTokenizedUrl = async (url, content, channel) => {
     else {
         if (isRace(content) && channel == null)
             channel = "INTERNATIONAL";
-        let stream = getAdditionalStreamsInfo(content.id, channel);
+        let stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
         f1tvUrl = await getContentStreamUrl(content.id, stream.channelId);
     }
     return f1tvUrl;
@@ -198,7 +198,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         const inputOptions = [
             '-probesize', '24M',
             '-analyzeduration', '6M',
-            '-rtbufsize', '2147M'
+            '-rtbufsize', '2147M',
+            '-live_start_index', '0'
         ];
 
         let pitInputOptions = [...inputOptions];
