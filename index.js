@@ -25,15 +25,14 @@ const getSessionChannelList = (url) => {
 
 const getTokenizedUrl = async (url, content, channel) => {
     let f1tvUrl;
-    if (isRace(content) && channel !== null) {
-        const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
-        const contentParams = getContentParams(url);
-        f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
+    if (content.metadata.additionalStreams == null) {
+        f1tvUrl = await getContentStreamUrl(content.id);
     }
     else {
-        const contentParams = getContentParams(url);
-        const stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, "INTERNATIONAL");
-        f1tvUrl = await getContentStreamUrl(contentParams.id, stream.channelId);
+        if (isRace(content) && channel == null)
+            channel = "INTERNATIONAL";
+        let stream = getAdditionalStreamsInfo(content.id, channel);
+        f1tvUrl = await getContentStreamUrl(content.id, stream.channelId);
     }
     return f1tvUrl;
 };
