@@ -33,7 +33,7 @@ test('Check for valid episode id', () => {
 test('Validate altername race data stream', () => {
     getContentInfo(raceUrl)
         .then(content => {
-            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'data');
+            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'DATA');
             const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
             expect(channelId).toBe(raceChannelIdData);       
         });
@@ -42,7 +42,7 @@ test('Validate altername race data stream', () => {
 test('Validate altername driver data stream', () => {
     getContentInfo(raceUrl)
         .then(content => {
-            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'ham');
+            const stream  = getAdditionalStreamsInfo(content.metadata.additionalStreams, 'HAM');
             const channelId = getChannelIdFromPlaybackUrl(stream.playbackUrl);
             expect(channelId).toBe(raceChannelIdHam);        
         });
