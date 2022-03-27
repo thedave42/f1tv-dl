@@ -25,6 +25,7 @@ const getSessionChannelList = (url) => {
 
 const getTokenizedUrl = async (url, content, channel) => {
     let f1tvUrl;
+    log.debug(JSON.stringify(content.metadata, 2, 4));
     if (content.metadata.additionalStreams == null) {
         f1tvUrl = await getContentStreamUrl(content.id);
     }
@@ -32,7 +33,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         if (isRace(content) && channel == null)
             channel = "INTERNATIONAL";
         let stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
-        f1tvUrl = await getContentStreamUrl(content.id, stream.channelId);
+        let channelId = (stream.playbackUrl !== null && stream.playbackUrl.indexOf('channelId') == -1) ? null : stream.channelId;
+        f1tvUrl = await getContentStreamUrl(content.id, channelId);
     }
     return f1tvUrl;
 };
@@ -100,7 +102,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         desc: 'Specify video size to download as WxH or \'best\' to select the highest resolution. (e.g. 640x360, 1920x1080, best)',
                         default: 'best',
                         alias: 's'
-                    })                     
+                    })
                     .option('format', {
                         type: 'string',
                         desc: 'Specify mp4 or TS output (default mp4)',
@@ -199,7 +201,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
         const plDetails = await getProgramStreamId(f1tvUrl, audioStream, videoSize);
-        log.debug(JSON.stringif(plDetails,2,4));
+        log.debug(JSON.stringify(plDetails, 2, 4));
         const programStream = plDetails.videoId;
         const audioStreamId = plDetails.audioId;
         let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:p:${programStream}:a:${audioStreamId}`] : ['-map', `0:p:${programStream}:a`];
