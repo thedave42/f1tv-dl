@@ -1,5 +1,5 @@
 {
-  "name": "f1tv-dl",
+  "name": "@thedave42/f1tv-dl",
   "version": "0.24.0",
   "description": "Watch videos from f1tv locally",
   "main": "index.js",
@@ -7,8 +7,7 @@
     "f1tv-dl": "index.js"
   },
   "scripts": {
-    "test": "node --trace-warnings node_modules/jest/bin/jest.js --detectOpenHandles --no-cache",
-    "preinstall": "npx npm-force-resolutions"
+    "test": "node --trace-warnings node_modules/jest/bin/jest.js --detectOpenHandles --no-cache"
   },
   "author": "dave@digitalnoise.net",
   "license": "ISC",
