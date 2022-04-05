@@ -204,14 +204,14 @@ const getTokenizedUrl = async (url, content, channel) => {
         log.debug(JSON.stringify(plDetails, 2, 4));
         const programStream = plDetails.videoId;
         const audioStreamId = plDetails.audioId;
-        let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:p:${programStream}:a:${audioStreamId}`] : ['-map', `0:p:${programStream}:a`];
+        let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:a:m:id:${audioStreamId}`] : ['-map', `0:a`];
         //let audioCodecParameters = (false) ? ['-c:a', 'aac', '-ar', '48000', '-b:a', '256k'] : ['-c:a', 'copy']; // leaving this in case they switch races back to 96kHz audio
         let audioCodecParameters = ['-c:a', 'copy'];
         const inputOptions = [
             '-probesize', '24M',
             '-analyzeduration', '6M',
             '-rtbufsize', '2147M',
-            '-live_start_index', '0'
+            //'-live_start_index', '0'
         ];
 
         let pitInputOptions = [...inputOptions];
@@ -243,7 +243,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             ]);
 
             audioStreamMapping = [
-                '-map', `0:p:${programStream}:a:${audioStreamId}`,
+                '-map', `0:a:m:id:${audioStreamId}`,
                 '-map', `1:a:0`,
             ];
 
@@ -268,16 +268,16 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         const options = (format == "mp4") ?
             [
-                '-map', `0:p:${programStream}:v`,
+                '-map', `0:v:m:id:${programStream}`,
                 ...audioStreamMapping,
                 `-c:v`, 'copy',
                 ...audioCodecParameters,
-                '-bsf:a', 'aac_adtstoasc',
+                //'-bsf:a', 'aac_adtstoasc',
                 '-movflags', 'faststart',
                 '-y'
             ] :
             [
-                '-map', `0:p:${programStream}:v`,
+                '-map', `0:v:m:id:${programStream}`,
                 ...audioStreamMapping,
                 `-c:v`, 'copy',
                 ...audioCodecParameters,
