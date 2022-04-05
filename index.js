@@ -248,9 +248,15 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
         */
 
-        let pitUrl = await getTokenizedUrl(url, content, 'F1 LIVE');
+        let pitUrl;
         if (includePitLaneAudio && isRace(content)) {
             log.info(`Adding Pit Lane Channel audio as second audio channel.`);
+
+            pitUrl = await getTokenizedUrl(url, content, 'F1 LIVE');
+            const pitDetails = await getProgramStreamId(pitUrl, 'eng', '480x270');
+
+            //log.info(JSON.stringify(pitDetails, 2, 4))
+
 
             log.debug('pit url:', pitUrl);
 
@@ -259,7 +265,11 @@ const getTokenizedUrl = async (url, content, channel) => {
                 //'-live_start_index', '50'
             ]);
 
+            const pitSelectFormatString = (useDash) ? '1:v:m:id:%i' : '1:p:%i:v';
+            const pitSelectString = util.format(pitSelectFormatString, pitDetails.videoId);
+
             audioStreamMapping = [
+                '-map', pitSelectString,
                 '-map', audioSelectString,
                 '-map', `1:a:0`,
             ];
