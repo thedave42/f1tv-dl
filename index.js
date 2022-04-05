@@ -4,6 +4,7 @@ const yargs = require('yargs');
 const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
+const util = require('util');
 
 const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
@@ -196,17 +197,33 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
 
         log.debug('tokenized url:', f1tvUrl);
+
+        const useDash = (f1tvUrl.indexOf('m3u8') == -1);
+        if (useDash) log.info('Using DASH.');
+
         const ext = (format == "mp4") ? 'mp4' : 'ts';
         const outFile = (isRace(content) && channel !== null) ? `${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}` : `${getContentParams(url).name}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
 
         const plDetails = await getProgramStreamId(f1tvUrl, audioStream, videoSize);
         log.debug(JSON.stringify(plDetails, 2, 4));
+
         const programStream = plDetails.videoId;
         const audioStreamId = plDetails.audioId;
-        let audioStreamMapping = (audioStreamId !== -1) ? ['-map', `0:a:m:id:${audioStreamId}`] : ['-map', `0:a`];
-        //let audioCodecParameters = (false) ? ['-c:a', 'aac', '-ar', '48000', '-b:a', '256k'] : ['-c:a', 'copy']; // leaving this in case they switch races back to 96kHz audio
+        const useDefaultAudio = (audioStreamId == -1);
+        const videoSelectFormatString = (useDash) ? '0:v:m:id:%i' : '0:p:%i:v';
+        const dashFormatString = (useDefaultAudio) ? '0:a' : '0:a:m:id:%i';
+        const hlsFormatString = (useDefaultAudio) ? `0:p:${programStream}:a` : `0:p:${programStream}:a:%i`;
+        const audioSelectFormatString = (useDash) ? dashFormatString : hlsFormatString;
+
+        const videoSelectString = util.format(videoSelectFormatString, programStream);
+        const audioSelectString = util.format(audioSelectFormatString, audioStreamId);
+
+        log.debug(`Video selection: ${videoSelectString} / Audio selection: ${audioSelectString}`);
+ 
+        let audioStreamMapping =  ['-map', audioSelectString];
         let audioCodecParameters = ['-c:a', 'copy'];
+
         const inputOptions = [
             '-probesize', '24M',
             '-analyzeduration', '6M',
@@ -243,7 +260,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             ]);
 
             audioStreamMapping = [
-                '-map', `0:a:m:id:${audioStreamId}`,
+                '-map', audioSelectString,
                 '-map', `1:a:0`,
             ];
 
@@ -268,7 +285,7 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         const options = (format == "mp4") ?
             [
-                '-map', `0:v:m:id:${programStream}`,
+                '-map', videoSelectString,
                 ...audioStreamMapping,
                 `-c:v`, 'copy',
                 ...audioCodecParameters,
@@ -277,7 +294,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-y'
             ] :
             [
-                '-map', `0:v:m:id:${programStream}`,
+                '-map', videoSelectString,
                 ...audioStreamMapping,
                 `-c:v`, 'copy',
                 ...audioCodecParameters,
