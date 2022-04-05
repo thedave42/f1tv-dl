@@ -72,6 +72,11 @@ Log in to your f1tv account, navigate to the video you want to watch, and copy t
 
 `f1tv-dl <url> --channel-list`
 
-## Download the pit lane channel stream from a race
+## Download the data channel stream from a race
 
-`f1tv-dl <url> -c pit`
+`f1tv-dl <url> -c data`
+
+## Add audio from the international broadcast feed 
+
+`f1tv-dl <url> -i nld`
+
