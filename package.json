@@ -20,10 +20,13 @@
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.8.0",
     "minimist": "^1.2.6",
+    "mpd-parser": "^0.21.0",
     "puppeteer": "^13.5.1",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-adblocker": "^2.12.0",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "xml-query": "^1.5.0",
+    "xml-reader": "^2.4.3",
     "yargs": "^17.4.0"
   },
   "devDependencies": {
