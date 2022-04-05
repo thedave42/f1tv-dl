@@ -260,7 +260,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             ]);
 
             audioStreamMapping = [
-                '-map', `0:a:m:id:${audioStreamId}`,
+                '-map', audioSelectString,
                 '-map', `1:a:0`,
             ];
 
