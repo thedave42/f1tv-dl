@@ -11,35 +11,35 @@ Positionals:
   url  The f1tv url for the video                                       [string]
 
 Options:
-      --help                    Show help                              [boolean]
-      --version                 Show version number                    [boolean]
-  -c, --channel                 Choose an alternate channel for a content with
-                                multiple video feeds. Use the channel-list
-                                option to see a list of channels and specify
-                                name/number/tla to select alternate channel.
+      --help                 Show help                                 [boolean]
+      --version              Show version number                       [boolean]
+  -c, --channel              Choose an alternate channel for a content with
+                             multiple video feeds. Use the channel-list option
+                             to see a list of channels and specify
+                             name/number/tla to select alternate channel.
                                                         [string] [default: null]
-  -p, --include-pit-lane-audio  Include the Pit Lane Channel audio stream as a
-                                secondary audio channel. (Only works for content
-                                with a Pit Lane Channel)
-                                                      [boolean] [default: false]
-  -t, --itsoffset               Used to sync Pit Lane Channel Audio. Specify the
-                                time offset as '(-)hh:mm:ss.SSS'
+  -i, --international-audio  Select a language to include from the INTERNATIONAL
+                             feed. This audio will be included as a secondary
+                             audio track on the file.
+              [string] [choices: "eng", "nld", "deu", "fra", "por", "spa", "fx"]
+  -t, --itsoffset            Used to sync Pit Lane Channel Audio. Specify the
+                             time offset as '(-)hh:mm:ss.SSS'
                                               [string] [default: "00:00:00.000"]
-  -a, --audio-stream            Specify audio stream language to download
+  -a, --audio-stream         Specify audio stream language to download
                                                        [string] [default: "eng"]
-  -s, --video-size              Specify video size to download as WxH or 'best'
-                                to select the highest resolution. (e.g. 640x360,
-                                1920x1080, best)      [string] [default: "best"]
-  -f, --format                  Specify mp4 or TS output (default mp4)
+  -s, --video-size           Specify video size to download as WxH or 'best' to
+                             select the highest resolution. (e.g. 640x360,
+                             1920x1080, best)         [string] [default: "best"]
+  -f, --format               Specify mp4 or TS output (default mp4)
                                 [string] [choices: "mp4", "ts"] [default: "mp4"]
-  -o, --output-directory        Specify a directory for the downloaded file
+  -o, --output-directory     Specify a directory for the downloaded file
                                                         [string] [default: null]
-  -U, --username                F1TV User name          [string] [default: null]
-  -P, --password                F1TV password           [string] [default: null]
-      --channel-list            Provides a list of channels available from url
-                                (for videos with multiple cameras)
+  -U, --username             F1TV User name             [string] [default: null]
+  -P, --password             F1TV password              [string] [default: null]
+      --channel-list         Provides a list of channels available from url (for
+                             videos with multiple cameras)
                                                       [boolean] [default: false]
-  -l, --log-level               set the log level
+  -l, --log-level            set the log level
           [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
 ```
 ## Use
