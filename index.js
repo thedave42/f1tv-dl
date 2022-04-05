@@ -32,7 +32,7 @@ const getTokenizedUrl = async (url, content, channel) => {
     }
     else {
         if (isRace(content) && channel == null)
-            channel = "INTERNATIONAL";
+            channel = "F1 LIVE";
         let stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
         let channelId = (stream.playbackUrl !== null && stream.playbackUrl.indexOf('channelId') == -1) ? null : stream.channelId;
         f1tvUrl = await getContentStreamUrl(content.id, channelId);
@@ -46,7 +46,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             url: url,
             channel: channel,
             channelList: channelList,
-            includePitLaneAudio: includePitLaneAudio,
+            internationalAudio: internationalAudio,
             itsoffset: itsoffset,
             audioStream: audioStream,
             videoSize: videoSize,
@@ -74,11 +74,11 @@ const getTokenizedUrl = async (url, content, channel) => {
                         default: null,
                         alias: 'c'
                     })
-                    .option('include-pit-lane-audio', {
-                        type: 'boolean',
-                        desc: 'Include the Pit Lane Channel audio stream as a secondary audio channel. (Only works for content with a Pit Lane Channel)',
-                        default: false,
-                        alias: 'p'
+                    .option('international-audio', {
+                        type: 'string',
+                        desc: 'Select a language to include from the INTERNATIONAL feed. This audio will be included as a secondary audio track on the file.',
+                        choices: ['eng', 'nld', 'deu', 'fra', 'por', 'spa', 'fx'],
+                        alias: 'i'
                     })
                     .option('itsoffset', {
                         type: 'string',
@@ -86,10 +86,10 @@ const getTokenizedUrl = async (url, content, channel) => {
                         alias: 't',
                         default: '00:00:00.000',
                         coerce: key => {
-                            const pattern = new RegExp(/^-?\d{2}:\d{2}:\d{2}\.\d{3}/);
+                            const pattern = new RegExp(/^'?-?\d{2}:\d{2}:\d{2}\.\d{3}'?/);
                             if (!pattern.test(key))
                                 throw new Error(`Invalid format for itsoffset: ${key}. Use (-)hh:mm:ss.SSS`);
-                            return key;
+                            return key.replace(/'/g, '');
                         }
                     })
                     .option('audio-stream', {
@@ -199,6 +199,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         log.debug('tokenized url:', f1tvUrl);
 
         const useDash = (f1tvUrl.indexOf('m3u8') == -1);
+        const includeInternationalAudio = (internationalAudio !== undefined);
+
         if (useDash) log.info('Using DASH.');
 
         const ext = (format == "mp4") ? 'mp4' : 'ts';
@@ -208,16 +210,12 @@ const getTokenizedUrl = async (url, content, channel) => {
         const plDetails = await getProgramStreamId(f1tvUrl, audioStream, videoSize);
         log.debug(JSON.stringify(plDetails, 2, 4));
 
+
         const programStream = plDetails.videoId;
         const audioStreamId = plDetails.audioId;
-        const useDefaultAudio = (audioStreamId == -1);
         const videoSelectFormatString = (useDash) ? '0:v:m:id:%i' : '0:p:%i:v';
-        const dashFormatString = (useDefaultAudio) ? '0:a' : '0:a:m:id:%i';
-        const hlsFormatString = (useDefaultAudio) ? `0:p:${programStream}:a` : `0:p:${programStream}:a:%i`;
-        const audioSelectFormatString = (useDash) ? dashFormatString : hlsFormatString;
-
         const videoSelectString = util.format(videoSelectFormatString, programStream);
-        const audioSelectString = util.format(audioSelectFormatString, audioStreamId);
+        const audioSelectString = (useDash) ? '0:a' : `0:p:${programStream}:a`;
 
         log.debug(`Video selection: ${videoSelectString} / Audio selection: ${audioSelectString}`);
  
@@ -248,38 +246,44 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
         */
 
-        let pitUrl;
-        if (includePitLaneAudio && isRace(content)) {
-            log.info(`Adding Pit Lane Channel audio as second audio channel.`);
+        let intlUrl;
+        if (includeInternationalAudio && isRace(content)) {
+            log.info(`Adding ${internationalAudio} commentary from the international feed as a second audio channel.`);
+            log.info(itsoffset);
 
-            pitUrl = await getTokenizedUrl(url, content, 'F1 LIVE');
-            const pitDetails = await getProgramStreamId(pitUrl, 'eng', '480x270');
+            intlUrl = await getTokenizedUrl(url, content, 'INTERNATIONAL');
+            const intlDetails = await getProgramStreamId(intlUrl, internationalAudio, '480x270');
 
-            //log.info(JSON.stringify(pitDetails, 2, 4))
+            //log.info(JSON.stringify(intlDetails, 2, 4))
 
 
-            log.debug('pit url:', pitUrl);
+            log.debug('intl url:', intlUrl);
 
             pitInputOptions.push(...[
                 '-itsoffset', itsoffset,
                 //'-live_start_index', '50'
             ]);
 
-            const pitSelectFormatString = (useDash) ? '1:v:m:id:%i' : '1:p:%i:v';
-            const pitSelectString = util.format(pitSelectFormatString, pitDetails.videoId);
+            const intlVideoSelectFormatString = (useDash) ? '1:v:m:id:%i' : '1:p:%i:v';
+            const intlVideoSelectString = util.format(intlVideoSelectFormatString, intlDetails.videoId);
+
+            const intlAudioSelectFormatString = (useDash) ? '1:a:m:id:%i' : `1:p:${programStream}:a:%i`;
+            const intlAudioSelectString = util.format(intlAudioSelectFormatString, intlDetails.audioId);
 
             audioStreamMapping = [
-                '-map', pitSelectString,
+                '-map', intlVideoSelectString,
                 '-map', audioSelectString,
-                '-map', `1:a:0`,
+                '-map', intlAudioSelectString,
             ];
+
+            let intlLangId = (internationalAudio == 'eng') ? 'sky' : internationalAudio;
 
             audioCodecParameters = [
                 '-c:a', 'copy',
-                `-metadata:s:a:0`, `language=${audioStream}`,
-                `-disposition:a:0`, `0`,
-                `-metadata:s:a:1`, 'language=lat',
-                `-disposition:a:1`, `default`
+                `-metadata:s:a:0`, `language=eng`,
+                `-disposition:a:0`, `default`,
+                `-metadata:s:a:1`, `language=${intlLangId}`,
+                `-disposition:a:1`, `0`
             ];
         }
 
@@ -313,12 +317,12 @@ const getTokenizedUrl = async (url, content, channel) => {
 
 
 
-        return (includePitLaneAudio && isRace(content))
+        return (includeInternationalAudio && isRace(content))
             ?  // Use this command when adding pitlane audio
             ffmpeg()
                 .input(f1tvUrl)
                 .inputOptions(inputOptions)
-                .input(pitUrl)
+                .input(intlUrl)
                 .inputOptions(pitInputOptions)
                 .outputOptions(options)
                 .on('start', commandLine => {
