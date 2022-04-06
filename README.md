@@ -44,7 +44,7 @@ Options:
 ```
 ## Use
 
-Clone the repo and run npm install to install dependencies.
+Use npm to install.
 
 ([ffmpeg and ffprobe](https://www.ffmpeg.org/) are required and need to be present in the path)
 
