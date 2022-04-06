@@ -4,3 +4,6 @@ __tests__/**
 Dockerfile
 run.sh
 .github/**
+.env*
+archive/**
+jest.config.js
