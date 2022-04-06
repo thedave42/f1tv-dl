@@ -230,7 +230,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             //'-live_start_index', '0'
         ];
 
-        let pitInputOptions = [...inputOptions];
+        let intlInputOptions = [...inputOptions];
 
         if (audioStreamId !== -1) {
             log.info(`Found audio stream that matches ${config.makeItGreen(audioStream)}.`);
@@ -241,26 +241,20 @@ const getTokenizedUrl = async (url, content, channel) => {
             log.info('Using default audio stream.');
         }
 
-        /*
-        if (isRace(content)) {
-            log.info(`Downsampling race audio to 48kHz for maximum compatibility.`);
-        }
-        */
-
         let intlUrl;
         if (includeInternationalAudio && isRace(content)) {
             log.info(`Adding ${internationalAudio} commentary from the international feed as a second audio channel.`);
-            log.info(itsoffset);
+            log.debug(itsoffset);
 
             intlUrl = await getTokenizedUrl(url, content, 'INTERNATIONAL');
             const intlDetails = await getProgramStreamId(intlUrl, internationalAudio, '480x270');
 
-            //log.info(JSON.stringify(intlDetails, 2, 4))
+            log.debug(JSON.stringify(intlDetails, 2, 4))
 
 
             log.debug('intl url:', intlUrl);
 
-            pitInputOptions.push(...[
+            intlInputOptions.push(...[
                 '-itsoffset', itsoffset,
                 //'-live_start_index', '50'
             ]);
@@ -292,19 +286,13 @@ const getTokenizedUrl = async (url, content, channel) => {
 
         log.info('Output file:', config.makeItGreen(outFileSpec));
 
-        //process.exit(0);
-
-        // ffmpeg -i "" -itsoffset -00:00:01.350 -i "" -c copy -map 0:p:5:v -map -0:p:5:a:m:language:eng -map 1:p:0:a -metadata:s:a:0 language=eng -metadata:s:a:1 language=lat test.ts
-
-
-
         const options = (format == "mp4") ?
             [
                 '-map', videoSelectString,
                 ...audioStreamMapping,
                 `-c:v`, 'copy',
                 ...audioCodecParameters,
-                //'-bsf:a', 'aac_adtstoasc',
+                '-bsf:a', 'aac_adtstoasc',
                 '-movflags', 'faststart',
                 '-y'
             ] :
@@ -316,15 +304,13 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-y'
             ];
 
-
-
         return (includeInternationalAudio && isRace(content))
-            ?  // Use this command when adding pitlane audio
+            ?  // Use this command when adding international audio
             ffmpeg()
                 .input(f1tvUrl)
                 .inputOptions(inputOptions)
                 .input(intlUrl)
-                .inputOptions(pitInputOptions)
+                .inputOptions(intlInputOptions)
                 .outputOptions(options)
                 .on('start', commandLine => {
                     log.debug('Executing command:', config.makeItGreen(commandLine));
