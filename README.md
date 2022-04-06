@@ -19,8 +19,8 @@ Options:
                              name/number/tla to select alternate channel.
                                                         [string] [default: null]
   -i, --international-audio  Select a language to include from the INTERNATIONAL
-                             feed. This audio will be included as a secondary
-                             audio track on the file.
+                             feed. This audio will be included in the file as a
+                             secondary audio track.
               [string] [choices: "eng", "nld", "deu", "fra", "por", "spa", "fx"]
   -t, --itsoffset            Used to sync secondary audio. Specify the time
                              offset as '(-)hh:mm:ss.SSS'
