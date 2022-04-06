@@ -1,0 +1,6 @@
+.*ignore
+__tests__/**
+.eslintrc.json
+Dockerfile
+run.sh
+.github/**
