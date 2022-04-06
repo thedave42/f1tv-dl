@@ -249,7 +249,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             intlUrl = await getTokenizedUrl(url, content, 'INTERNATIONAL');
             const intlDetails = await getProgramStreamId(intlUrl, internationalAudio, '480x270');
 
-            log.debug(JSON.stringify(intlDetails, 2, 4))
+            log.debug(JSON.stringify(intlDetails, 2, 4));
 
 
             log.debug('intl url:', intlUrl);
