@@ -76,7 +76,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('international-audio', {
                         type: 'string',
-                        desc: 'Select a language to include from the INTERNATIONAL feed. This audio will be included as a secondary audio track on the file.',
+                        desc: 'Select a language to include from the INTERNATIONAL feed. This audio will be included in the file as a secondary audio track.',
                         choices: ['eng', 'nld', 'deu', 'fra', 'por', 'spa', 'fx'],
                         alias: 'i'
                     })
