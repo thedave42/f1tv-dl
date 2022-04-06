@@ -46,12 +46,10 @@ Options:
 
 Clone the repo and run npm install to install dependencies.
 
-([ffmpeg](https://www.ffmpeg.org/) is required and needs to be present in the path)
+([ffmpeg and ffprobe](https://www.ffmpeg.org/) are required and need to be present in the path)
 
 ```
-git clone https://github.com/thedave42/f1tv-dl.git
-cd f1tv-dl
-npm i -g
+npm i -g @thedave42/f1tv-dl
 ```
 
 or use Docker (no need to install ffmpeg)
@@ -76,7 +74,7 @@ Log in to your f1tv account, navigate to the video you want to watch, and copy t
 
 `f1tv-dl <url> -c data`
 
-## Add audio from the international broadcast feed 
+## Add Dutch audio from the international broadcast feed 
 
 `f1tv-dl <url> -i nld`
 
