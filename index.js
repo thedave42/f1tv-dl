@@ -292,7 +292,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                 ...audioStreamMapping,
                 `-c:v`, 'copy',
                 ...audioCodecParameters,
-                //'-bsf:a', 'aac_adtstoasc',
+                '-bsf:a', 'aac_adtstoasc',
                 '-movflags', 'faststart',
                 '-y'
             ] :
