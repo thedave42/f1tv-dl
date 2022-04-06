@@ -22,8 +22,8 @@ Options:
                              feed. This audio will be included as a secondary
                              audio track on the file.
               [string] [choices: "eng", "nld", "deu", "fra", "por", "spa", "fx"]
-  -t, --itsoffset            Used to sync Pit Lane Channel Audio. Specify the
-                             time offset as '(-)hh:mm:ss.SSS'
+  -t, --itsoffset            Used to sync secondary audio. Specify the time
+                             offset as '(-)hh:mm:ss.SSS'
                                               [string] [default: "00:00:00.000"]
   -a, --audio-stream         Specify audio stream language to download
                                                        [string] [default: "eng"]

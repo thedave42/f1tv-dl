@@ -82,7 +82,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     })
                     .option('itsoffset', {
                         type: 'string',
-                        desc: 'Used to sync Pit Lane Channel Audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
+                        desc: 'Used to sync secondary audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
                         alias: 't',
                         default: '00:00:00.000',
                         coerce: key => {
