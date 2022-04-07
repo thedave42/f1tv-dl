@@ -166,7 +166,7 @@ jobs:
           shell: bash
       needs: 
         - update-version-info
-        - create_release
+        - create-release
         - build-and-publish-docker
         - npm-publish
 
