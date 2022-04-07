@@ -43,7 +43,7 @@ jobs:
       - name: Read new version
         id: semver
         run: |
-          pkg-version=$(npm view . version) 
+          pkg-version=`npm view . version` 
           echo "::set-output name=semver::$pkg-version"
 
       - name: New version is ${{ steps.semver.outputs.semver }}
