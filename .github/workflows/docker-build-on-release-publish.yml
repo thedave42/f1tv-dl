@@ -25,11 +25,11 @@ jobs:
 
     outputs:
       semver: ${{ steps.semver.outputs.semver }}
+      sha: ${steps.commit.outputs.commit_long_sha}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-        
+        uses: actions/checkout@v3    
 
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
@@ -60,6 +60,7 @@ jobs:
         run: echo "New version is ${{ steps.semver.outputs.semver }}"
 
       - name: Commit changes
+        id: commit
         uses: EndBug/add-and-commit@v5
         with:
           author_name: the Dave
@@ -79,7 +80,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses:  actions/checkout@v3
+        with:
+          ref: ${{ needs.update-version-info.outputs.sha }}
 
       - name: Creating docker image version ${{ needs.update-version-info.outputs.semver }}
         run: echo "Creating docker image version ${{ needs.update-version-info.outputs.semver }}"
@@ -115,7 +118,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses:  actions/checkout@v3
+        with:
+          ref: ${{ needs.update-version-info.outputs.sha }}
 
       - name: Creating release version ${{ needs.update-version-info.outputs.semver }}
         run: echo "Creating release version ${{ needs.update-version-info.outputs.semver }}"
@@ -144,8 +149,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
+        uses:  actions/checkout@v3
+        with:
+          ref: ${{ needs.update-version-info.outputs.sha }}
+          
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
         with:
