@@ -159,7 +159,7 @@ jobs:
           dry-run: true
 
   finalze:
-      name: Publish npm release
+      name: Finalize release
       runs-on: ubuntu-20.04
       defaults:
         run:
