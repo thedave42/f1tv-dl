@@ -107,7 +107,6 @@ jobs:
         shell: bash
     needs: 
       - update-version-info
-      - build-and-publish-docker
 
     steps:
       - name: Checkout code
@@ -139,7 +138,6 @@ jobs:
         shell: bash
     needs: 
       - update-version-info
-      - build-and-publish-docker
 
     steps:
       - name: Checkout code
@@ -159,3 +157,26 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
           access: "public"
           dry-run: true
+
+  finalze:
+      name: Publish npm release
+      runs-on: ubuntu-20.04
+      defaults:
+        run:
+          shell: bash
+      needs: 
+        - update-version-info
+        - create_release
+        - build-and-publish-docker
+        - npm-publish
+
+      steps:
+        - name: Everything successfully published
+          if: ${{ success() }}
+          run: |
+            echo "Everything successfully published"
+
+        - name: Something went wrong
+          if: ${{ failure() }}
+          run: |
+            echo "Something went wrong"
