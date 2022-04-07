@@ -43,7 +43,7 @@ jobs:
       - name: Read new version
         id: semver
         run: |
-          echo "::set-output name=semver::$(npm view . version)
+          echo "::set-output name=semver::$(npm view . version)"
 
       - name: New version is ${{ steps.semver.outputs.semver }}
         run: echo "New version is ${{ steps.semver.outputs.semver }}"
