@@ -25,7 +25,7 @@ jobs:
 
     outputs:
       semver: ${{ steps.semver.outputs.semver }}
-      sha: ${{ steps.commit.outputs.commit_long_sha }}
+      sha: ${{ steps.commit.outputs.sha }}
 
     steps:
       - name: Checkout code
@@ -36,14 +36,10 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Run npm version ${{ github.event.inputs.version_type }}
-        run: |
-          npm version ${{ github.event.inputs.version_type }} --no-git-tag-version
-
-      - name: Read new version
+      - name: Update version information
         id: semver
         run: |
-          echo "::set-output name=semver::$(npm view . version)"
+          echo "::set-output name=semver::$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)"
 
       - name: New version is ${{ steps.semver.outputs.semver }}
         run: echo "New version is ${{ steps.semver.outputs.semver }}"
@@ -55,6 +51,15 @@ jobs:
           git add .
           git commit -m "Updated version to $pkg-version"
           git push
+
+      - name: Get new commit sha
+        id: commit
+        run: |
+           echo "::set-output name=sha::$(git rev-parse HEAD)"
+
+      - name: Updated version ${{ steps.commit.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}
+        run: |
+          echo "Updated version ${{ steps.commit.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
 
 
   build-and-publish-docker:
@@ -68,6 +73,9 @@ jobs:
     steps:
       - name: Checkout code
         uses:  actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.update-version-info.outputs.sha }}
 
       - name: Creating docker image version ${{ needs.update-version-info.outputs.semver }}
         run: echo "Creating docker image version ${{ needs.update-version-info.outputs.semver }}"
@@ -104,6 +112,9 @@ jobs:
     steps:
       - name: Checkout code
         uses:  actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.update-version-info.outputs.sha }}
 
       - name: Creating release version ${{ needs.update-version-info.outputs.semver }}
         run: echo "Creating release version ${{ needs.update-version-info.outputs.semver }}"
@@ -133,7 +144,10 @@ jobs:
     steps:
       - name: Checkout code
         uses:  actions/checkout@v3
-
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.update-version-info.outputs.sha }}
+          
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
         with:
