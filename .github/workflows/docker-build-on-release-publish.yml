@@ -29,7 +29,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3    
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - run: git checkout HEAD^
 
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
@@ -82,7 +86,9 @@ jobs:
       - name: Checkout code
         uses:  actions/checkout@v3
         with:
-          ref: ${{ needs.update-version-info.outputs.sha }}
+          fetch-depth: 2
+
+      - run: git checkout HEAD^
 
       - name: Creating docker image version ${{ needs.update-version-info.outputs.semver }}
         run: echo "Creating docker image version ${{ needs.update-version-info.outputs.semver }}"
@@ -101,7 +107,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          push: true
+          push: false
           tags: |
             ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:latest
             ghcr.io/${{ github.repository_owner }}/f1tv-dl-docker:${{ needs.update-version-info.outputs.semver }}
@@ -120,7 +126,9 @@ jobs:
       - name: Checkout code
         uses:  actions/checkout@v3
         with:
-          ref: ${{ needs.update-version-info.outputs.sha }}
+          fetch-depth: 2
+
+      - run: git checkout HEAD^
 
       - name: Creating release version ${{ needs.update-version-info.outputs.semver }}
         run: echo "Creating release version ${{ needs.update-version-info.outputs.semver }}"
@@ -134,7 +142,7 @@ jobs:
           tag_name: ${{ needs.update-version-info.outputs.semver }}
           release_name: fltv-dl ${{ needs.update-version-info.outputs.semver }}
           body: ${{ github.event.inputs.release_description }}
-          draft: false
+          draft: true
           prerelease: false
 
   npm-publish:
@@ -151,7 +159,9 @@ jobs:
       - name: Checkout code
         uses:  actions/checkout@v3
         with:
-          ref: ${{ needs.update-version-info.outputs.sha }}
+          fetch-depth: 2
+
+      - run: git checkout HEAD^
 
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
