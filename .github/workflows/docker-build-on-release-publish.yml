@@ -57,9 +57,9 @@ jobs:
         run: |
            echo "::set-output name=sha::$(git rev-parse HEAD)"
 
-      - name: Updated version ${{ steps.commit.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}
+      - name: Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}
         run: |
-          echo "Updated version ${{ steps.commit.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
+          echo "Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
 
 
   build-and-publish-docker:
@@ -147,7 +147,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ needs.update-version-info.outputs.sha }}
-          
+
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
         with:
