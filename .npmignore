@@ -7,3 +7,4 @@ run.sh
 .env*
 archive/**
 jest.config.js
+.vscode/**
