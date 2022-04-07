@@ -49,7 +49,7 @@ jobs:
           git config user.name github-actions
           git config user.email dave@digitalnoise.net
           git add .
-          git commit -m "Updated version to $pkg-version"
+          git commit -m "Updated to release version ${{ steps.semver.outputs.semver }}"
           git push
 
       - name: Get new commit sha
