@@ -39,7 +39,10 @@ Options:
       --channel-list         Provides a list of channels available from url (for
                              videos with multiple cameras)
                                                       [boolean] [default: false]
-  -l, --log-level            set the log level
+      --stream-url           Return the tokenized URL for use in another
+                             application and do not download the video
+                                                      [boolean] [default: false]
+  -l, --log-level            Set the log level
           [choices: "trace", "debug", "info", "warn", "error"] [default: "info"]
 ```
 ## Use
