@@ -140,6 +140,7 @@ jobs:
         shell: bash
     needs: 
       - update-version-info
+      - build-and-publish-docker
 
     steps:
       - name: Checkout code
