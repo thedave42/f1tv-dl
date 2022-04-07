@@ -25,7 +25,7 @@ jobs:
 
     outputs:
       semver: ${{ steps.semver.outputs.semver }}
-      sha: ${steps.commit.outputs.commit_long_sha}
+      sha: ${{ steps.commit.outputs.commit_long_sha }}
 
     steps:
       - name: Checkout code
@@ -152,7 +152,7 @@ jobs:
         uses:  actions/checkout@v3
         with:
           ref: ${{ needs.update-version-info.outputs.sha }}
-          
+
       - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
         with:
