@@ -55,6 +55,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             outputDirectory: outputDir,
             username: f1Username,
             password: f1Password,
+            streamUrl: streamUrl,
             logLevel: logLevel
         } = yargs
             .command('$0 <url>', 'Download a video', (yarg) => {
@@ -143,9 +144,14 @@ const getTokenizedUrl = async (url, content, channel) => {
                         desc: 'Provides a list of channels available from url (for videos with multiple cameras)',
                         default: false
                     })
+                    .option('stream-url', {
+                        type: 'boolean',
+                        desc: 'Return the tokenized URL for use in another application and do not download the video',
+                        default: false
+                    })
                     .option('log-level', {
                         alias: 'l',
-                        desc: 'set the log level',
+                        desc: 'Set the log level',
                         choices: ['trace', 'debug', 'info', 'warn', 'error'],
                         default: 'info'
                     })
@@ -198,6 +204,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         }
 
         log.debug('tokenized url:', f1tvUrl);
+        if (streamUrl) return log.info(f1tvUrl);
 
         const useDash = (f1tvUrl.indexOf('m3u8') == -1);
         const includeInternationalAudio = (internationalAudio !== undefined);

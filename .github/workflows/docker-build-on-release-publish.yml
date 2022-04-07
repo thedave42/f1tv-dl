@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v2
         
 
-      - name: Set up Node.js ${{ matrix.node-version }} environment
+      - name: Set up Node.js 14 environment
         uses: actions/setup-node@v1
         with:
           node-version: "14"
@@ -131,3 +131,27 @@ jobs:
           body: ${{ github.event.inputs.release_description }}
           draft: false
           prerelease: false
+
+  npm-publish:
+    name: Publish npm release
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    needs: 
+      - update-version-info
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js 14 environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+
+      - name: Publishing version ${{ needs.update-version-info.outputs.semver }} to npm
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          access: "public"
