@@ -3,7 +3,7 @@
         "commonjs": true,
         "es6": true,
         "node": true,
-        "jest/globals": true
+        "jest": true
     },
     "plugins": [
         "jest"
@@ -33,6 +33,27 @@
             {
                 "allowSingleLine": true
             }
+        ],
+        "arrow-spacing": [
+            "warn",
+            {
+                "before": true,
+                "after": true
+            }
+        ],
+        "no-var": [
+            "warn"
+        ],
+        "comma-style": [
+            "off",
+            null,
+            {
+                "exceptions": {}
+            }
+        ],
+        "func-call-spacing": [
+            "warn",
+            "never"
         ]
     }
 }
