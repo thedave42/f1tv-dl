@@ -86,7 +86,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         type: 'string',
                         desc: 'Used to sync secondary audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
                         alias: 't',
-                        default: '00:00:00.000',
+                        default: '-00:00:04.750',
                         coerce: key => {
                             const pattern = new RegExp(/^'?-?\d{2}:\d{2}:\d{2}\.\d{3}'?/);
                             if (!pattern.test(key))
@@ -278,7 +278,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                 '-map', intlAudioSelectString,
             ];
 
-            let intlLangId = (internationalAudio == 'eng') ? 'sky' : internationalAudio;
+            let intlLangId = (internationalAudio == 'eng') ? 'Sky' : internationalAudio;
 
             audioCodecParameters = [
                 '-c:a', 'copy',
