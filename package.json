@@ -21,7 +21,7 @@
     "loglevel": "^1.8.0",
     "minimist": "^1.2.6",
     "mpd-parser": "^0.21.1",
-    "puppeteer": "^13.5.2",
+    "puppeteer": "^14.1.0",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-adblocker": "^2.12.0",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
