@@ -16,7 +16,7 @@
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",
     "hls-parser": "^0.10.4",
-    "inquirer": "^8.2.2",
+    "inquirer": "^9.0.1",
     "log-timestamp": "^0.3.0",
     "loglevel": "^1.8.0",
     "minimist": "^1.2.6",
