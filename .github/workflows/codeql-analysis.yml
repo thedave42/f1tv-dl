@@ -90,7 +90,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: sarif-files
-          path: ../results
+          path: /home/runner/work/f1tv-dl/results/*.sarif
 
     #- name: Debug Analysis
     #  uses: zbazztian/codeql-debug@master
