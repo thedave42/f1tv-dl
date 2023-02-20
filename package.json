@@ -27,7 +27,7 @@
     "puppeteer-extra-plugin-stealth": "^2.9.0",
     "xml-query": "^1.5.0",
     "xml-reader": "^2.4.3",
-    "yargs": "^17.4.0"
+    "yargs": "^17.7.0"
   },
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "^2.1.7",
