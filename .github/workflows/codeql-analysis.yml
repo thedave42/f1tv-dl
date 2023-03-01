@@ -48,7 +48,7 @@ jobs:
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL for security-and-quality scan
         if: ${{ github.event_name != 'pull_request'}}
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
           # If you wish to specify custom queries, you can do so here or in a config file.
@@ -59,7 +59,7 @@ jobs:
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL for Pull Request
         if: ${{ github.event_name == 'pull_request'}}
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
           # If you wish to specify custom queries, you can do so here or in a config file.
@@ -70,7 +70,7 @@ jobs:
       # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
       # If this step fails, then you should remove it and run the build manually (see below)
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
+        uses: github/codeql-action/autobuild@v2
 
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 https://git.io/JvXDl
@@ -84,42 +84,10 @@ jobs:
       #   make release
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
-
-    #- name: Debug Analysis
-    #  uses: zbazztian/codeql-debug@master
-    #  with:
-    #    language: ${{ matrix.language }}
-
-    #- name: Upload loc as a Build Artifact
-    #  uses: actions/upload-artifact@v2.2.0
-    #  with:
-    #    name: codeql-debug-results
-    #    path: codeql-debug-results
-    #    retention-days: 30
-
-    # Before uploading the database as an artifact,
-    # clean up its temporary data to reduce the artifact size,
-    # and zip it so the artifact is a single file.
-    # This reduces the load on the Actions artifact file database.
-#    - name: Clean up CodeQL database before upload
-#      id: database-cleanup
-#      env:
-#        LANGUAGE: ${{ matrix.language }}
-#      run: |
-#          set -xu
-#          DATABASE_DIR="/home/runner/work/_temp/codeql_databases/$LANGUAGE"
-#          echo "Cleaning up database in $DATABASE_DIR"
-#          for SUB_DIR in log results working; do
-#            rm -rf $DATABASE_DIR/$SUB_DIR
-#          done
-#          echo "Zipping database"
-#          DATABASE_ZIP="semmle-code-$LANGUAGE-db.zip"
-#          zip -r "$DATABASE_ZIP" "$DATABASE_DIR"
-#          echo "::set-output name=zip::$DATABASE_ZIP"
-#    - name: Upload CodeQL database
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: semmle-code-${{ matrix.language }}-db
-#        path: ${{ steps.database-cleanup.outputs.zip }}
-
+        uses: github/codeql-action/analyze@v2
+        
+      - name: Upload CodeQL Sarif
+        uses: actions/upload-artifact@v2
+        with:
+          name: sarif-files
+          path: /home/runner/work/f1tv-dl/results/*.sarif
