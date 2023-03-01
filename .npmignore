@@ -8,3 +8,5 @@ run.sh
 archive/**
 jest.config.js
 .vscode/**
+*.mp4
+*.ts

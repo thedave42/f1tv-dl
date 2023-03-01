@@ -6,9 +6,27 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 const util = require('util');
+const tvdb = require('../tvdb-namer');  // Need to make this a npm package
+const DASHDownloader = require('./lib/dash-downloader');
+const bento4Bin = require('@wickednesspro/bento4-latest');
+const bento4 = require('fluent-bento4')({ bin: bento4Bin.binPath });
 
-const { isF1tvUrl, isRace } = require('./lib/f1tv-validator');
-const { getContentInfo, getContentStreamUrl, getAdditionalStreamsInfo, getContentParams, saveF1tvToken, getProgramStreamId } = require('./lib/f1tv-api');
+const { isF1tvUrl, isRace, validKey } = require('./lib/f1tv-validator');
+const { getContentInfo, getContentStreamUrl, getAdditionalStreamsInfo, saveF1tvToken, getF1tvLoginToken, getProgramStreamId } = require('./lib/f1tv-api');
+const { Streams, VideoStream, AudioStream, StreamProgressTracker } = require('./lib/streams');
+let getWvKeys;
+try {
+    // If you know how to deal with this, here's your chance.  I'm not providing help with this.
+    getWvKeys = require('./lib/getwvkeys');
+}
+catch (e) {
+    getWvKeys = (data) => {throw new Error(data);}
+}
+
+
+const fixedLength = (str, length) => {
+    return (str.length > length) ? str.substring(0, length) : str.padStart(length);
+};
 
 const getSessionChannelList = (url) => {
     getContentInfo(url)
@@ -41,6 +59,10 @@ const getTokenizedUrl = async (url, content, channel) => {
     return f1tvUrl;
 };
 
+const capitalizeFirstLetter = ([first, ...rest]) => {
+    return [first.toUpperCase(), ...rest].join('');
+};
+
 (async () => {
     try {
         let {
@@ -53,6 +75,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             videoSize: videoSize,
             format: format,
             outputDirectory: outputDir,
+            token: token,
             username: f1Username,
             password: f1Password,
             streamUrl: streamUrl,
@@ -86,7 +109,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                         type: 'string',
                         desc: 'Used to sync secondary audio. Specify the time offset as \'(-)hh:mm:ss.SSS\'',
                         alias: 't',
-                        default: '-00:00:04.750',
+                        default: '-00:00:03.750',
                         coerce: key => {
                             const pattern = new RegExp(/^'?-?\d{2}:\d{2}:\d{2}\.\d{3}'?/);
                             if (!pattern.test(key))
@@ -126,6 +149,12 @@ const getTokenizedUrl = async (url, content, channel) => {
                             }
                             return outDir;
                         }
+                    })
+                    .option('token', {
+                        type: 'string',
+                        desc: 'F1TV Entitlement Token: ',
+                        alias: 'T',
+                        default: process.env.F1TV_TOKEN || null
                     })
                     .option('username', {
                         type: 'string',
@@ -173,6 +202,7 @@ const getTokenizedUrl = async (url, content, channel) => {
         catch (e) {
             log.debug(e);
             if (e.response.status >= 400 && e.response.status <= 499) {
+                /*
                 if (f1Username == null || f1Password == null) {
                     const userPrompt = await inquirer.prompt([
                         {
@@ -195,6 +225,24 @@ const getTokenizedUrl = async (url, content, channel) => {
                 }
                 log.info('Login required.  This may take 10-30 seconds.');
                 await saveF1tvToken(f1Username, f1Password);
+                //*/
+                if (token == null) {
+                    log.info('You need a valid F1TV login to use this applicaiton.');
+                    log.info('When are logged into the website, you can use the JavaScript debug console in your browser to retrieve the token using the following JavaScript:\n');
+                    log.info(config.makeItGreen(`\tconsole.log(document.cookie.split(';').filter(cookie => cookie.indexOf('entitlement_token')!=-1)[0].split('=')[1])\n`));
+                    const userPrompt = await inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'token',
+                            message: 'Enter F1TV Entitlement Token:',
+                            default: token
+                        }
+                    ]);
+                    if (userPrompt.token == null || userPrompt.token.length == 0)
+                        throw new Error('Please provide a valid token.');
+                    token = userPrompt.token;
+                }
+                token = saveF1tvToken(token);
                 log.info('Authorization token encrypted and stored for future use at:', config.makeItGreen(`${config.HOME}${config.PATH_SEP}${config.DS_FILENAME}`));
                 f1tvUrl = await getTokenizedUrl(url, content, channel);
             }
@@ -203,21 +251,67 @@ const getTokenizedUrl = async (url, content, channel) => {
             }
         }
 
-        log.debug('tokenized url:', f1tvUrl);
-        if (streamUrl) return log.info(f1tvUrl);
+        log.debug('tokenized url:', f1tvUrl.url);
 
-        const useDash = (f1tvUrl.indexOf('m3u8') == -1);
+        const useDash = (f1tvUrl.url.indexOf('m3u8') == -1);
         const includeInternationalAudio = (internationalAudio !== undefined);
 
-        if (useDash) log.info('Using DASH.');
-
         const ext = (format == "mp4") ? 'mp4' : 'ts';
-        const outFile = (isRace(content) && channel !== null) ? `${getContentParams(url).name}-${channel.split(' ').shift()}.${ext}` : `${getContentParams(url).name}.${ext}`;
-        const outFileSpec = (outputDir !== null) ? outputDir + outFile : outFile;
+        const series = capitalizeFirstLetter(content.containers.categories.find(c => c.categoryId >= 2000 && c.categoryId < 3000).categoryName.toLowerCase().replace(/fia_/, '').replace(/_/g, ' '));
+        const seriesNumber = await tvdb(series.toLowerCase().replace(/ /g, '-'), content.metadata.year, content.metadata.emfAttributes.sessionStartDate, `${content.metadata.emfAttributes.Meeting_Name} ${content.metadata.titleBrief}`);
+        const nameSpec = (seriesNumber != null) ? `${series} - ${seriesNumber} - ${content.metadata.title}` : `${series} - ${content.metadata.title}`;
+        const outFile = (isRace(content) && channel !== null) ? `${nameSpec}-${channel.split(' ').shift()}.${ext}` : `${nameSpec}.${ext}`;
+        const outFileSpec = (outputDir !== null) ? outputDir + outFile.replace(/:/g, '-') : outFile.replace(/:/g, '-');        
+        const drmStreams = new Streams([]);
+        const drmStreamProgressTracker = new StreamProgressTracker();
+        const mp4Metadata = [];
+        if (isRace(content) && format == "mp4") {
+            mp4Metadata.push(...[
+                `-metadata`, `media_type=10`,
+                //`-metadata`, `show=${content.metadata.emfAttributes.Series}`, //Don't know why I can't add this
+                `-metadata`, `season_number=${content.metadata.season}`,
+                `-metadata`, `episode_id=${seriesNumber}`,
+                `-metadata`, `title=${content.metadata.emfAttributes.Global_Meeting_Name} - ${content.metadata.emfAttributes.Circuit_Short_Name} - ${content.metadata.titleBrief}`,
+                `-metadata`, `year=${content.metadata.season}`
+            ]);
+        }
 
-        const plDetails = await getProgramStreamId(f1tvUrl, audioStream, videoSize);
+        if (useDash) log.info(`Using ${config.makeItGreen('DASH')}.`);
+
+        const plDetails = await getProgramStreamId(f1tvUrl.url, audioStream, videoSize);
         log.debug(JSON.stringify(plDetails, 2, 4));
+        if (useDash && plDetails.hasDRM) {
+            log.info(`Found DRM Stream ${config.makeItGreen(f1tvUrl.streamType)}.`);
+            log.info(`License URL: ${config.makeItGreen(f1tvUrl.laURL)}`);
+            log.info(`KID: ${config.makeItGreen(plDetails.kid)}`);
+            log.info(`PSSH: ${config.makeItGreen(plDetails.pssh)}`);
 
+            try {
+                const key = await getWvKeys({
+                    headers: {
+                        "entitlementtoken": getF1tvLoginToken()
+                    },
+                    licenseUrl: f1tvUrl.laURL,
+                    pssh: plDetails.pssh,
+                });
+                log.info(`Key found: ${config.makeItGreen(key[0].key)}`);
+                plDetails.key = key[0].key;
+            }
+            catch (e) {
+                log.info(`This content is protected by Digital Rights Management.`);
+                const ans = await inquirer.prompt([{
+                    type: 'input',
+                    name: 'key',
+                    message: 'Please enter a valid decryption key to download: ',
+                    validate: validKey
+                }])
+                log.info(`Using key: ${config.makeItGreen(ans.key)}`);
+                plDetails.key = ans.key;
+                if (ans.key.split(':')[0].toLowerCase() != plDetails.kid.toLowerCase()) log.info(`KID of the entered key does not match the content. Decryption may not work.`);
+            }
+        }
+
+        if (streamUrl) return log.info(f1tvUrl.url);
 
         const programStream = plDetails.videoId;
         const audioStreamId = plDetails.audioId;
@@ -226,8 +320,8 @@ const getTokenizedUrl = async (url, content, channel) => {
         const audioSelectString = (useDash) ? '0:a' : `0:p:${programStream}:a`;
 
         log.debug(`Video selection: ${videoSelectString} / Audio selection: ${audioSelectString}`);
- 
-        let audioStreamMapping =  ['-map', audioSelectString];
+
+        let audioStreamMapping = ['-map', audioSelectString];
         let audioCodecParameters = ['-c:a', 'copy'];
 
         const inputOptions = [
@@ -248,23 +342,59 @@ const getTokenizedUrl = async (url, content, channel) => {
             log.info('Using default audio stream.');
         }
 
+        if (plDetails.hasDRM && plDetails.key != undefined) {
+            log.info('Prepare download of encrypted streams.');
+            drmStreams.addStream(new VideoStream(f1tvUrl.url, `${nameSpec}-video.mp4`, plDetails.key, plDetails.videoId));
+            drmStreams.addStream(new AudioStream(f1tvUrl.url, `${nameSpec}-audio.m4a`, plDetails.key, 'eng'))
+        }
+
         let intlUrl;
         if (includeInternationalAudio && isRace(content)) {
             log.info(`Adding ${internationalAudio} commentary from the international feed as a second audio channel.`);
             log.debug(itsoffset);
 
             intlUrl = await getTokenizedUrl(url, content, 'INTERNATIONAL');
-            const intlDetails = await getProgramStreamId(intlUrl, internationalAudio, '480x270');
+            const intlDetails = await getProgramStreamId(intlUrl.url, internationalAudio, '480x270');
+            if (useDash && intlDetails.hasDRM) {
+                log.info(`Using same DRM key for additional streams.`);
+                intlDetails.key = plDetails.key;
+                log.info(`Key found: ${config.makeItGreen(intlDetails.key)}`);
+                /*
+                log.info(`Found DRM Stream ${config.makeItGreen(intlUrl.streamType)}.`);
+                log.info(`License URL: ${config.makeItGreen(intlUrl.laURL)}`);
+                log.info(`KID: ${config.makeItGreen(intlDetails.kid)}`);
+                log.info(`PSSH: ${config.makeItGreen(intlDetails.pssh)}`);
+                try {
+                    const key = await getWvKeys({
+                        headers: {
+                            "entitlementtoken": getF1tvLoginToken()
+                        },
+                        licenseUrl: intlUrl.laURL,
+                        pssh: intlDetails.pssh,
+                    });
+                    log.info(`Key found: ${config.makeItGreen(key[0].key)}`);
+                    intlDetails.key = key[0].key;
+                }
+                catch (e) {
+                    log.info(`No key found. ${e.message}`);
+                }
+                //*/
+            }
 
             log.debug(JSON.stringify(intlDetails, 2, 4));
 
 
-            log.debug('intl url:', intlUrl);
+            log.debug('intl url:', intlUrl.url);
 
             intlInputOptions.push(...[
                 '-itsoffset', itsoffset,
                 //'-live_start_index', '50'
             ]);
+
+            if (intlDetails.hasDRM && intlDetails.key != undefined) {
+                log.info(`Adding download of additional audio (${internationalAudio}) encrypted stream.`);
+                drmStreams.addStream(new AudioStream(intlUrl.url, `${nameSpec}-audio-${internationalAudio}.m4a`, intlDetails.key, internationalAudio));
+            }
 
             const intlVideoSelectFormatString = (useDash) ? '1:v:m:id:%i' : '1:p:%i:v';
             const intlVideoSelectString = util.format(intlVideoSelectFormatString, intlDetails.videoId);
@@ -273,7 +403,7 @@ const getTokenizedUrl = async (url, content, channel) => {
             const intlAudioSelectString = util.format(intlAudioSelectFormatString, intlDetails.audioId);
 
             audioStreamMapping = [
-                '-map', intlVideoSelectString,
+                //'-map', intlVideoSelectString,
                 '-map', audioSelectString,
                 '-map', intlAudioSelectString,
             ];
@@ -283,8 +413,10 @@ const getTokenizedUrl = async (url, content, channel) => {
             audioCodecParameters = [
                 '-c:a', 'copy',
                 `-metadata:s:a:0`, `language=eng`,
+                `-metadata:s:a:0`, `title=English`,
                 `-disposition:a:0`, `default`,
                 `-metadata:s:a:1`, `language=${intlLangId}`,
+                `-metadata:s:a:1`, `title=${intlLangId}`,
                 `-disposition:a:1`, `0`
             ];
         }
@@ -292,6 +424,112 @@ const getTokenizedUrl = async (url, content, channel) => {
         log.debug(programStream);
 
         log.info('Output file:', config.makeItGreen(outFileSpec));
+
+        if (plDetails.hasDRM && plDetails.key != undefined) {
+            log.info(`Starting download of encrypted streams...`)
+            let promises = [];
+            for (const stream of drmStreams) {
+                const download = new DASHDownloader(stream);
+                download.on('data', (data) => {
+                    drmStreamProgressTracker.update(data);
+                    process.stdout.write(`\r${drmStreamProgressTracker.toString()}`);
+                });
+                promises.push(download.start());
+            }
+            let results = await Promise.all(promises);
+            log.debug(results);
+
+            process.stdout.write(`\r\ndownload complete.\nStarting decryption of streams...`);
+
+            promises = [];
+            for (const stream of drmStreams) {
+                promises.push(bento4.mp4decrypt.exec(stream.decFilename, ['--key', stream.key, stream.encFilename]));
+            }
+            results = await Promise.all(promises);
+            log.debug(results);
+            log.info(`decryption complete.`);
+
+            const streamMapping = (includeInternationalAudio && isRace(content)) ?
+                [
+                    '-map', '0:v',
+                    '-map', '1:a',
+                    '-map', '2:a',
+                ] :
+                [
+                    '-map', '0:v',
+                    '-map', '1:a',
+                ];
+
+            const options = (format == "mp4") ?
+                [
+                    ...streamMapping,
+                    `-c:v`, 'copy',
+                    ...audioCodecParameters,
+                    '-bsf:a', 'aac_adtstoasc',
+                    '-movflags', 'faststart',
+                    ...mp4Metadata,
+                    '-y'
+                ] :
+                [
+                    ...streamMapping,
+                    `-c:v`, 'copy',
+                    ...audioCodecParameters,
+                    '-y'
+                ];
+
+
+            return (includeInternationalAudio && isRace(content))
+                ?
+                ffmpeg()
+                    .input(drmStreams[0].decFilename)
+                    .input(drmStreams[1].decFilename)
+                    .input(drmStreams[2].decFilename)
+                    .inputOptions([
+                        '-itsoffset', itsoffset
+                    ])
+                    .outputOptions(options)
+                    .on('start', commandLine => {
+                        log.info('Muxing decrypted streams:', config.makeItGreen(commandLine));
+                    })
+                    .on('codecData', data => {
+                        log.debug(data);
+                    })
+                    .on('progress', info => {
+                        const outStr = '\rFrames=' + config.makeItGreen(fixedLength(`${info.frames}`, 10)) + ' Fps=' + config.makeItGreen(fixedLength(`${info.currentFps}`, 5) + 'fps') + ' Kbps=' + config.makeItGreen(fixedLength(`${info.currentKbps}`, 7) + 'Kbps') + ' Duration=' + config.makeItGreen(fixedLength(`${info.timemark}`, 11)) + ' Percent Complete=' + config.makeItGreen(fixedLength(`${parseInt(info.percent)}`, 3) + '%');
+                        process.stdout.write(outStr);
+                    })
+                    .on('end', () => {
+                        log.info('\nMuxing complete.');
+                    })
+                    .on('error', e => {
+                        log.error('ffmpeg error:', e.message);
+                        log.info(e);
+                    })
+                    .save(outFileSpec)
+                :
+                ffmpeg()
+                    .input(drmStreams[0].decFilename)
+                    .input(drmStreams[1].decFilename)
+                    .outputOptions(options)
+                    .on('start', commandLine => {
+                        log.info('Muxing decrypted streams:', config.makeItGreen(commandLine));
+                    })
+                    .on('codecData', data => {
+                        log.debug(data);
+                    })
+                    .on('progress', info => {
+                        const outStr = '\rFrames=' + config.makeItGreen(fixedLength(`${info.frames}`, 10)) + ' Fps=' + config.makeItGreen(fixedLength(`${info.currentFps}`, 5) + 'fps') + ' Kbps=' + config.makeItGreen(fixedLength(`${info.currentKbps}`, 7) + 'Kbps') + ' Duration=' + config.makeItGreen(fixedLength(`${info.timemark}`, 11)) + ' Percent Complete=' + config.makeItGreen(fixedLength(`${parseInt(info.percent)}`, 3) + '%');
+                        process.stdout.write(outStr);
+                    })
+                    .on('end', () => {
+                        log.info('\nMuxing complete.');
+                    })
+                    .on('error', e => {
+                        log.error('ffmpeg error:', e.message);
+                        log.info(e);
+                    })
+                    .save(outFileSpec);
+        }
 
         const options = (format == "mp4") ?
             [
@@ -301,6 +539,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                 ...audioCodecParameters,
                 '-bsf:a', 'aac_adtstoasc',
                 '-movflags', 'faststart',
+                ...mp4Metadata,
                 '-y'
             ] :
             [
@@ -314,9 +553,9 @@ const getTokenizedUrl = async (url, content, channel) => {
         return (includeInternationalAudio && isRace(content))
             ?  // Use this command when adding international audio
             ffmpeg()
-                .input(f1tvUrl)
+                .input(f1tvUrl.url)
                 .inputOptions(inputOptions)
-                .input(intlUrl)
+                .input(intlUrl.url)
                 .inputOptions(intlInputOptions)
                 .outputOptions(options)
                 .on('start', commandLine => {
@@ -328,7 +567,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     log.info('File duration:', config.makeItGreen(data.duration), '\n');
                 })
                 .on('progress', info => {
-                    const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                    const outStr = '\rFrames=' + config.makeItGreen(fixedLength(`${info.frames}`, 10)) + ' Fps=' + config.makeItGreen(fixedLength(`${info.currentFps}`, 5) + 'fps') + ' Kbps=' + config.makeItGreen(fixedLength(`${info.currentKbps}`, 7) + 'Kbps') + ' Duration=' + config.makeItGreen(fixedLength(`${info.timemark}`, 11)) + ' Percent Complete=' + config.makeItGreen(fixedLength(`${parseInt(info.percent)}`, 3) + '%');
                     process.stdout.write(outStr);
                 })
                 .on('end', () => {
@@ -342,7 +581,7 @@ const getTokenizedUrl = async (url, content, channel) => {
 
             : // Use this command for everything else
             ffmpeg()
-                .input(f1tvUrl)
+                .input(f1tvUrl.url)
                 .inputOptions(inputOptions)
                 .outputOptions(options)
                 .on('start', commandLine => {
@@ -354,7 +593,7 @@ const getTokenizedUrl = async (url, content, channel) => {
                     log.info('File duration:', config.makeItGreen(data.duration), '\n');
                 })
                 .on('progress', info => {
-                    const outStr = '\rFrames=' + config.makeItGreen(`${info.frames}`.padStart(10)) + ' Fps=' + config.makeItGreen(`${info.currentFps}`.padStart(5) + 'fps') + ' Kbps=' + config.makeItGreen(`${info.currentKbps}`.padStart(7) + 'Kbps') + ' Duration=' + config.makeItGreen(`${info.timemark}`) + ' Percent Complete=' + config.makeItGreen(`${parseInt(info.percent)}`.padStart(3) + '%');
+                    const outStr = '\rFrames=' + config.makeItGreen(fixedLength(`${info.frames}`, 10)) + ' Fps=' + config.makeItGreen(fixedLength(`${info.currentFps}`, 5) + 'fps') + ' Kbps=' + config.makeItGreen(fixedLength(`${info.currentKbps}`, 7) + 'Kbps') + ' Duration=' + config.makeItGreen(fixedLength(`${info.timemark}`, 11)) + ' Percent Complete=' + config.makeItGreen(fixedLength(`${parseInt(info.percent)}`, 3) + '%');
                     process.stdout.write(outStr);
                 })
                 .on('end', () => {
