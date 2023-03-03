@@ -417,7 +417,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                 `-disposition:a:0`, `default`,
                 `-metadata:s:a:1`, `language=${intlLangId}`,
                 `-metadata:s:a:1`, `title=${intlLangId}`,
-                `-disposition:a:1`, `0`
+                `-disposition:a:1`, `none`
             ];
         }
 
