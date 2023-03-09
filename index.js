@@ -76,8 +76,8 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
             format: format,
             outputDirectory: outputDir,
             token: token,
-            username: f1Username,
-            password: f1Password,
+            //username: f1Username,
+            //password: f1Password,
             streamUrl: streamUrl,
             logLevel: logLevel
         } = yargs
@@ -156,6 +156,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                         alias: 'T',
                         default: process.env.F1TV_TOKEN || null
                     })
+                    /*
                     .option('username', {
                         type: 'string',
                         desc: 'F1TV User name',
@@ -168,6 +169,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                         alias: 'P',
                         default: process.env.F1TV_PASS || null
                     })
+                    //*/
                     .option('channel-list', {
                         type: 'boolean',
                         desc: 'Provides a list of channels available from url (for videos with multiple cameras)',
@@ -400,8 +402,8 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                 drmStreams.addStream(new AudioStream(intlUrl.url, `${nameSpec}-audio-${internationalAudio}.m4a`, intlDetails.key, internationalAudio));
             }
 
-            const intlVideoSelectFormatString = (useDash) ? '1:v:m:id:%i' : '1:p:%i:v';
-            const intlVideoSelectString = util.format(intlVideoSelectFormatString, intlDetails.videoId);
+            //const intlVideoSelectFormatString = (useDash) ? '1:v:m:id:%i' : '1:p:%i:v';
+            //const intlVideoSelectString = util.format(intlVideoSelectFormatString, intlDetails.videoId);
 
             const intlAudioSelectFormatString = (useDash) ? '1:a:m:id:%i' : `1:p:${programStream}:a:%i`;
             const intlAudioSelectString = util.format(intlAudioSelectFormatString, intlDetails.audioId);
