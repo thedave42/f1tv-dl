@@ -11,7 +11,7 @@ const DASHDownloader = require('./lib/dash-downloader');
 const bento4Bin = require('@wickednesspro/bento4-latest');
 const bento4 = require('fluent-bento4')({ bin: bento4Bin.binPath });
 
-const { isF1tvUrl, isRace, validKey } = require('./lib/f1tv-validator');
+const { isF1tvUrl, isRace, isRaceSeries, validKey } = require('./lib/f1tv-validator');
 const { getContentInfo, getContentStreamUrl, getAdditionalStreamsInfo, saveF1tvToken, getF1tvLoginToken, getProgramStreamId } = require('./lib/f1tv-api');
 const { Streams, VideoStream, AudioStream, StreamProgressTracker } = require('./lib/streams');
 let getWvKeys;
@@ -51,7 +51,7 @@ const getTokenizedUrl = async (url, content, channel) => {
     }
     else {
         if (isRace(content) && channel == null)
-            channel = "F1 LIVE";
+            channel = (content.metadata.season > 2020) ? "F1 LIVE" : "INTERNATIONAL";
         let stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
         let channelId = (stream.playbackUrl !== null && stream.playbackUrl.indexOf('channelId') == -1) ? null : stream.channelId;
         f1tvUrl = await getContentStreamUrl(content.id, channelId);
@@ -257,23 +257,27 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
         const includeInternationalAudio = (internationalAudio !== undefined);
 
         const ext = (format == "mp4") ? 'mp4' : 'ts';
-        const series = capitalizeFirstLetter(content.containers.categories.find(c => c.categoryId >= 2000 && c.categoryId < 3000).categoryName.toLowerCase().replace(/fia_/, '').replace(/_/g, ' '));
-        const seriesNumber = await tvdb(series.toLowerCase().replace(/ /g, '-'), content.metadata.year, content.metadata.emfAttributes.sessionStartDate, `${content.metadata.emfAttributes.Meeting_Name} ${content.metadata.titleBrief}`);
+        // if f1, f2, f3 race, series = content.metadata.emfAttributes.Series
+        // if other, series = content.metadata.genres[0]
+        const series = (isRaceSeries(content)) ? capitalizeFirstLetter(content.metadata.emfAttributes.Series.toLowerCase()) : capitalizeFirstLetter(content.metadata.emfAttributes.Series.toLowerCase()) + ' ' + content.metadata.genres[0];
+        const seriesNumber = await tvdb(series.toLowerCase().replace(/ /g, '-'), content.metadata.year, (content.metadata.emfAttributes.sessionStartDate != undefined)?content.metadata.emfAttributes.sessionStartDate:content.properties[0].sessionEndTime, `${content.metadata.title}`);
         const nameSpec = (seriesNumber != null) ? `${series} - ${seriesNumber} - ${content.metadata.title}` : `${series} - ${content.metadata.title}`;
         const outFile = (isRace(content) && channel !== null) ? `${nameSpec}-${channel.split(' ').shift()}.${ext}` : `${nameSpec}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile.replace(/:/g, '-') : outFile.replace(/:/g, '-');        
         const drmStreams = new Streams([]);
         const drmStreamProgressTracker = new StreamProgressTracker();
         const mp4Metadata = [];
-        if (isRace(content) && format == "mp4") {
+        if (format == "mp4") {
             mp4Metadata.push(...[
                 `-metadata`, `media_type=10`,
                 //`-metadata`, `show=${content.metadata.emfAttributes.Series}`, //Don't know why I can't add this
-                `-metadata`, `season_number=${content.metadata.season}`,
-                `-metadata`, `episode_id=${seriesNumber}`,
-                `-metadata`, `title=${content.metadata.emfAttributes.Global_Meeting_Name} - ${content.metadata.emfAttributes.Circuit_Short_Name} - ${content.metadata.titleBrief}`,
-                `-metadata`, `year=${content.metadata.season}`
+                `-metadata`, `season_number=${content.metadata.year}`,
+                `-metadata`, `title=${content.metadata.title}`,
+                `-metadata`, `year=${content.metadata.year}`
             ]);
+            if (seriesNumber != null) {
+                mp4Metadata.push(`-metadata`, `episode_id=${seriesNumber}`);
+            }
         }
 
         if (useDash) log.info(`Using ${config.makeItGreen('DASH')}.`);
