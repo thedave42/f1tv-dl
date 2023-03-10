@@ -39,7 +39,7 @@ jobs:
       - name: Update version information
         id: semver
         run: |
-          echo "::set-output name=semver::$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)"
+          echo "semver=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)" >> $GITHUB_OUTPUT
 
       - name: New version is ${{ steps.semver.outputs.semver }}
         run: echo "New version is ${{ steps.semver.outputs.semver }}"
@@ -55,11 +55,11 @@ jobs:
       - name: Get new commit sha
         id: commit
         run: |
-           echo "::set-output name=sha::$(git rev-parse HEAD)"
+           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}
         run: |
-          echo "Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
+          echo "::debug::Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
 
 
   build-and-publish-docker:

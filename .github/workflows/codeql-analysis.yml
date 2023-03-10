@@ -87,7 +87,7 @@ jobs:
         uses: github/codeql-action/analyze@v2
         
       - name: Upload CodeQL Sarif
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: sarif-files
           path: /home/runner/work/f1tv-dl/results/*.sarif

@@ -60,7 +60,7 @@ jobs:
           RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
 
       - name: Upload artifacts on failure
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: f1tv-build-artifacts

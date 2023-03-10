@@ -55,12 +55,12 @@ jobs:
         # ./node_modules/.bin/eslint . || exit 0
 
       - name: Upload results to GitHub
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: f1tv-dl-eslint.sarif
 
       - name: Upload sarif as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: f1tv-dl-eslint-results
           path: |
