@@ -29,7 +29,7 @@
     "m3u8stream": "^0.8.6",
     "minimist": "^1.2.7",
     "mpd-parser": "^0.21.1",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "2.6.7",
     "npm": "^8.19.3",
     "pretty-bytes": "^6.0.0",
     "pretty-bytes-es5": "^5.1.9",
