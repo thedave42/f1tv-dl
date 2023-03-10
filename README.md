@@ -2,7 +2,7 @@
 
 Watch videos locally from f1tv website
 
-Note: a valid username/password is required. The app will save your session so the they will only be required again when your session has expried.
+Note: a valid F1TV account is required. The app will save your session so the information will only be required again when your session has expried.
 
 ```
 f1tv-dl <url>
@@ -34,7 +34,7 @@ Options:
                                 [string] [choices: "mp4", "ts"] [default: "mp4"]
   -o, --output-directory     Specify a directory for the downloaded file
                                                         [string] [default: null]
-  -T, --token                F1TV Entitlement Token:    [string] [default: null]
+  -T, --token                F1TV Entitlement Token     [string] [default: null]
       --channel-list         Provides a list of channels available from url (for
                              videos with multiple cameras)
                                                       [boolean] [default: false]

@@ -152,7 +152,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                     })
                     .option('token', {
                         type: 'string',
-                        desc: 'F1TV Entitlement Token: ',
+                        desc: 'F1TV Entitlement Token',
                         alias: 'T',
                         default: process.env.F1TV_TOKEN || null
                     })
