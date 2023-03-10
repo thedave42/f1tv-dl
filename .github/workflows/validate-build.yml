@@ -3,89 +3,69 @@
 
 name: Validate build
 
-on:  
-  push:    
+on:
+  push:
     paths-ignore:
-      - '.github/**'
-      - '**.md'
-    branches: [ main ]
+      - ".github/**"
+      - "**.md"
+    branches: [main]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-      - '.github/**'
-      - '**.md'
+      - ".github/**"
+      - "**.md"
   schedule:
-    - cron: '6 11 * * 3'
+    - cron: "6 11 * * 3"
 
-concurrency: 
+concurrency:
   group: build-group-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build-and-test:
     if: github.actor != 'dependabot[bot]'
-    
+
     runs-on: macos-latest
     defaults:
       run:
         shell: bash
 
-    strategy:
-      matrix:
-        node-version: ['14']
-
     steps:
-    - 
-      name: Workflow Actor
-      run: echo This workflow was triggered by $GITHUB_ACTOR
-    
-    -
-      name: Ping api endpoint
-      run: ping -c 4 account.formula1.com
+      - name: Workflow Actor
+        run: echo This workflow was triggered by $GITHUB_ACTOR
 
-    - 
-      name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - 
-      name: Check access to login page
-      run: curl -o login.html -X GET https://account.formula1.com/#/en/login
-    
-    - 
-      name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ vars.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
 
-    -
-      name: Install app
-      run: npm i
+      - name: Install app
+        run: npm i
 
-    -
-      name: Run unit tests
-      run: npm test
-      timeout-minutes: 3
-      env:
-        RACEURL: ${{ secrets.RACEURL }}
-        EPISODEURL: ${{ secrets.EPISODEURL }}
-        F1TV_USER: ${{ secrets.F1TV_USER }}
-        F1TV_PASS: ${{ secrets.F1TV_PASS }}
-        RACENAME: ${{ secrets.RACENAME }}
-        RACEID: ${{ secrets.RACEID }}
-        EPISODENAME: ${{ secrets.EPISODENAME }}
-        EPISODEID: ${{ secrets.EPISODEID }}
-        RACECHANNELID_DATA: ${{ secrets.RACECHANNELID_DATA }}
-        RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
+      - name: Run unit tests
+        run: npm test
+        timeout-minutes: 3
+        env:
+          RACEURL: ${{ secrets.RACEURL }}
+          EPISODEURL: ${{ secrets.EPISODEURL }}
+          RACENAME: ${{ secrets.RACENAME }}
+          RACEID: ${{ secrets.RACEID }}
+          EPISODENAME: ${{ secrets.EPISODENAME }}
+          EPISODEID: ${{ secrets.EPISODEID }}
+          RACECHANNELID_DATA: ${{ secrets.RACECHANNELID_DATA }}
+          RACECHANNELID_HAM: ${{ secrets.RACECHANNELID_HAM }}
 
-    -
-       name: Upload artifacts on failure
-       uses: actions/upload-artifact@v2
-       if: failure()
-       with:
-         name: f1tv-build-artifacts
-         path: |
-          !node_modules/**
-          ./datastore-test.json
-          ./chromium_page*.png
-          ./login.html
+      - name: Upload artifacts on failure
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: f1tv-build-artifacts
+          path: |
+            !node_modules/**
+            ./datastore-test.json
+            ./chromium_page*.png
+            ./login.html

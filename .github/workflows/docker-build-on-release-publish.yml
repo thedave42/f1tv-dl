@@ -31,10 +31,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js 14 environment
-        uses: actions/setup-node@v1
+      - name: Set up Node.js ${{ vars.NODE_VERSION }} environment
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Update version information
         id: semver
@@ -146,10 +146,10 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.update-version-info.outputs.sha }}
 
-      - name: Set up Node.js 14 environment
-        uses: actions/setup-node@v1
+      - name: Set up Node.js ${{ vars.NODE_VERSION }} environment
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Publishing version ${{ needs.update-version-info.outputs.semver }} to npm
         uses: JS-DevTools/npm-publish@v1
