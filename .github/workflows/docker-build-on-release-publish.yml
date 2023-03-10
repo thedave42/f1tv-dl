@@ -174,9 +174,9 @@ jobs:
         - name: Everything successfully published
           if: ${{ success() }}
           run: |
-            echo "Everything successfully published"
+            echo "::debug::Everything successfully published"
 
         - name: Something went wrong
           if: ${{ failure() }}
           run: |
-            echo "Something went wrong"
+            echo "::debug::Something went wrong"
