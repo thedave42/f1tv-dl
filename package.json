@@ -27,6 +27,7 @@
     "mpd-parser": "^0.21.1",
     "node-fetch": "2.6.7",
     "pretty-bytes-es5": "^5.1.9",
+    "temp": "^0.9.4",
     "tough-cookie": "^4.1.2",
     "xml-query": "^1.5.0",
     "xml-reader": "^2.4.3",
@@ -42,15 +43,10 @@
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-standard": "^4.1.0",
     "jest": "^27.5.1",
-    "jwt-decode": "^3.1.2",
-    "temp": "^0.9.4",
-    "wtfnode": "^0.9.1"
+    "jwt-decode": "^3.1.2"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thedave42/f1tv-dl.git"
-  },
-  "config": {
-    "puppeteer_download_path": "./node_modules/puppeteer/.local-chromium"
   }
 }
