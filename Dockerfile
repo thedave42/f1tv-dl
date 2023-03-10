@@ -12,6 +12,6 @@ WORKDIR /f1tv
 COPY . /f1tv
 
 # --unsafe-perm is required for preinstall script in package.json
-RUN npm i --omit=dev --unsafe-perm
+RUN npm i --omit=dev
 
 ENTRYPOINT [ "/bin/sh", "run.sh" ]
