@@ -52,6 +52,7 @@ Use npm to install.
 ([ffmpeg and ffprobe](https://www.ffmpeg.org/) are required and need to be present in the path)
 
 ```
+npm i -g temp
 npm i -g @thedave42/f1tv-dl
 ```
 
