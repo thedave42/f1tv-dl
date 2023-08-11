@@ -6,7 +6,7 @@ const log = require('loglevel');
 const ffmpeg = require('@thedave42/fluent-ffmpeg');
 const inquirer = require('inquirer');
 const util = require('util');
-const tvdb = require('@thedave42/f1tv-namer');  // Need to make this a npm package
+const tvdb = require('../tvdb-namer');
 const DASHDownloader = require('./lib/dash-downloader');
 const bento4Bin = require('@wickednesspro/bento4-latest');
 const bento4 = require('fluent-bento4')({ bin: bento4Bin.binPath });
@@ -51,7 +51,7 @@ const getTokenizedUrl = async (url, content, channel) => {
     }
     else {
         if (isRace(content) && channel == null)
-            channel = (content.metadata.season > 2020) ? "F1 LIVE" : "INTERNATIONAL";
+            channel = (content.metadata.season > 2021) ? "F1 LIVE" : "INTERNATIONAL";
         let stream = getAdditionalStreamsInfo(content.metadata.additionalStreams, channel);
         let channelId = (stream.playbackUrl !== null && stream.playbackUrl.indexOf('channelId') == -1) ? null : stream.channelId;
         f1tvUrl = await getContentStreamUrl(content.id, channelId);
@@ -496,6 +496,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                     .outputOptions(options)
                     .on('start', commandLine => {
                         log.info('Muxing decrypted streams:', config.makeItGreen(commandLine));
+                        log.debug('Executing command:', config.makeItGreen(commandLine));
                     })
                     .on('codecData', data => {
                         log.debug(data);
@@ -519,6 +520,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                     .outputOptions(options)
                     .on('start', commandLine => {
                         log.info('Muxing decrypted streams:', config.makeItGreen(commandLine));
+                        log.debug('Executing command:', config.makeItGreen(commandLine));
                     })
                     .on('codecData', data => {
                         log.debug(data);
@@ -612,6 +614,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
                 .save(outFileSpec);
     }
     catch (e) {
+        
         log.error('Error:', e.message);
         log.debug(e);
     }
