@@ -262,7 +262,7 @@ const capitalizeFirstLetter = ([first, ...rest]) => {
         // if f1, f2, f3 race, series = content.metadata.emfAttributes.Series
         // if other, series = content.metadata.genres[0]
         const series = (isRaceSeries(content)) ? capitalizeFirstLetter(content.metadata.emfAttributes.Series.toLowerCase()) : capitalizeFirstLetter(content.metadata.emfAttributes.Series.toLowerCase()) + ' ' + content.metadata.genres[0];
-        const seriesNumber = await tvdb(content.metadata.emfAttributes.Series.toLowerCase().replace(/ /g, '-'), content.metadata.year, (content.metadata.emfAttributes.sessionEndDate != undefined)?content.metadata.emfAttributes.sessionEndDate:content.properties[0].sessionEndTime, `${content.metadata.title}`);
+        const seriesNumber = await tvdb(series.toLowerCase().replace(/ /g, '-'), content.metadata.year, (content.metadata.emfAttributes.sessionEndDate != undefined)?content.metadata.emfAttributes.sessionEndDate:content.properties[0].sessionEndTime, `${content.metadata.title}`);
         const nameSpec = (seriesNumber != null) ? `${series} - ${seriesNumber} - ${content.metadata.title}` : `${series} - ${content.metadata.title}`;
         const outFile = (isRace(content) && channel !== null) ? `${nameSpec}-${channel.split(' ').shift()}.${ext}` : `${nameSpec}.${ext}`;
         const outFileSpec = (outputDir !== null) ? outputDir + outFile.replace(/:/g, '-') : outFile.replace(/:/g, '-');        
