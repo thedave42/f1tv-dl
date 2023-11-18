@@ -31,15 +31,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js 14 environment
+      - name: Set up Node.js ${{ vars.NODE_VERSION }} environment
         uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Update version information
         id: semver
         run: |
-          echo "::set-output name=semver::$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)"
+          echo "semver=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)" >> $GITHUB_OUTPUT
 
       - name: New version is ${{ steps.semver.outputs.semver }}
         run: echo "New version is ${{ steps.semver.outputs.semver }}"
@@ -55,11 +55,11 @@ jobs:
       - name: Get new commit sha
         id: commit
         run: |
-           echo "::set-output name=sha::$(git rev-parse HEAD)"
+           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}
         run: |
-          echo "Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
+          echo "::debug::Updated version ${{ steps.semver.outputs.semver }}, new sha ${{ steps.commit.outputs.sha }}"
 
 
   build-and-publish-docker:
@@ -146,10 +146,10 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.update-version-info.outputs.sha }}
 
-      - name: Set up Node.js 14 environment
-        uses: actions/setup-node@v1
+      - name: Set up Node.js ${{ vars.NODE_VERSION }} environment
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Publishing version ${{ needs.update-version-info.outputs.semver }} to npm
         uses: JS-DevTools/npm-publish@v1
@@ -174,9 +174,10 @@ jobs:
         - name: Everything successfully published
           if: ${{ success() }}
           run: |
-            echo "Everything successfully published"
+            echo "::debug::Everything successfully published"
 
         - name: Something went wrong
           if: ${{ failure() }}
           run: |
-            echo "Something went wrong"
+            echo "::debug::Something went wrong"
+

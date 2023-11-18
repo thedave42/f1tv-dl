@@ -1,6 +1,6 @@
 {
   "name": "@thedave42/f1tv-dl",
-  "version": "0.25.17-alpha.0",
+  "version": "0.25.14-alpha.4",
   "description": "Watch videos from f1tv locally",
   "main": "index.js",
   "bin": {
@@ -12,42 +12,41 @@
   "author": "dave@digitalnoise.net",
   "license": "ISC",
   "dependencies": {
+    "@thedave42/f1tv-namer": "^0.0.4",
     "@thedave42/fluent-ffmpeg": "^1.0.5",
+    "@wickednesspro/bento4-latest": "^1.1.3",
     "axios": "^0.26.1",
-    "dotenv": "^16.0.0",
+    "axios-cookiejar-support": "^4.0.6",
+    "chokidar": "^3.5.3",
+    "dotenv": "^16.0.3",
+    "fluent-bento4": "^1.0.8",
     "hls-parser": "^0.10.4",
-    "inquirer": "^8.2.2",
-    "log-timestamp": "^0.3.0",
-    "loglevel": "^1.8.0",
-    "minimist": "^1.2.6",
+    "inquirer": "^8.2.5",
+    "iso-639": "^0.2.2",
+    "loglevel": "^1.8.1",
     "mpd-parser": "^0.21.1",
-    "puppeteer": "^13.5.2",
-    "puppeteer-extra": "^3.2.3",
-    "puppeteer-extra-plugin-adblocker": "^2.12.0",
-    "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "node-fetch": "2.6.7",
+    "pretty-bytes-es5": "^5.1.9",
+    "temp": "^0.9.4",
+    "tough-cookie": "^4.1.2",
     "xml-query": "^1.5.0",
     "xml-reader": "^2.4.3",
-    "yargs": "^17.4.0"
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "^2.1.7",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jest": "^26.1.3",
+    "eslint-plugin-jest": "^26.9.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-standard": "^4.1.0",
     "jest": "^27.5.1",
-    "jwt-decode": "^3.1.2",
-    "temp": "^0.9.4",
-    "wtfnode": "^0.9.1"
+    "jwt-decode": "^3.1.2"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thedave42/f1tv-dl.git"
-  },
-  "config": {
-    "puppeteer_download_path": "./node_modules/puppeteer/.local-chromium"
   }
 }

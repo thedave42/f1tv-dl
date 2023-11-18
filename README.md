@@ -2,7 +2,7 @@
 
 Watch videos locally from f1tv website
 
-Note: a valid username/password is required. The app will save your session so the they will only be required again when your session has expried.
+Note: a valid F1TV account is required. The app will save your session so the information will only be required again when your session has expried.
 
 ```
 f1tv-dl <url>
@@ -24,7 +24,7 @@ Options:
               [string] [choices: "eng", "nld", "deu", "fra", "por", "spa", "fx"]
   -t, --itsoffset            Used to sync secondary audio. Specify the time
                              offset as '(-)hh:mm:ss.SSS'
-                                              [string] [default: "00:00:00.000"]
+                                             [string] [default: "-00:00:03.750"]
   -a, --audio-stream         Specify audio stream language to download
                                                        [string] [default: "eng"]
   -s, --video-size           Specify video size to download as WxH or 'best' to
@@ -34,8 +34,7 @@ Options:
                                 [string] [choices: "mp4", "ts"] [default: "mp4"]
   -o, --output-directory     Specify a directory for the downloaded file
                                                         [string] [default: null]
-  -U, --username             F1TV User name             [string] [default: null]
-  -P, --password             F1TV password              [string] [default: null]
+  -T, --token                F1TV Entitlement Token     [string] [default: null]
       --channel-list         Provides a list of channels available from url (for
                              videos with multiple cameras)
                                                       [boolean] [default: false]
@@ -75,7 +74,7 @@ Log in to your f1tv account, navigate to the video you want to watch, and copy t
 
 ## Download the data channel stream from a race
 
-`f1tv-dl <url> -c data`
+`f1tv-dl <url> -c DATA`
 
 ## Add Dutch audio from the international broadcast feed 
 

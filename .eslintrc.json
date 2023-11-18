@@ -18,7 +18,7 @@
     },
     "rules": {
         "no-unused-vars": [
-            1,
+            0,
             {
                 "vars": "local"
             }
