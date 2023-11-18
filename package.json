@@ -12,7 +12,7 @@
   "author": "dave@digitalnoise.net",
   "license": "ISC",
   "dependencies": {
-    "@thedave42/f1tv-namer": "^0.0.3",
+    "@thedave42/f1tv-namer": "^0.0.4",
     "@thedave42/fluent-ffmpeg": "^1.0.5",
     "@wickednesspro/bento4-latest": "^1.1.3",
     "axios": "^0.26.1",
